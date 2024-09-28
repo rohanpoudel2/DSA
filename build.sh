@@ -1,4 +1,5 @@
 #!/bin/bash
+rm -rf build
 
 # Create build directory if it doesn't exist
 if [ ! -d "build" ]; then
