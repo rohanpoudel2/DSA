@@ -47,7 +47,8 @@ void Product::setQuantity(double productQuantity)
 // Written by Rohan Poudel
 void Product::displayProduct() const
 {
-  std::cout << "Product Name: " << name << std::endl;
-  std::cout << "Price: $" << price << std::endl;
-  std::cout << "Quantity: " << quantity << std::endl;
+  using namespace std;
+  cout << "Product Name: " << name << endl;
+  cout << "Price: $" << price << endl;
+  cout << "Quantity: " << quantity << endl;
 }
