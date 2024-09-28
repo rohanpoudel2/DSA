@@ -9,15 +9,16 @@ set(CMAKE_CXX_STANDARD 11)
 # Include directories for headers
 include_directories(include)
 
-# Specify the output directory for the build to be the project root
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
+# Specify the output directory for the build to be the build folder
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 # Add the executable for the main project
 add_executable(EcommerceStore
-    src/main.cpp
-    src/Product.cpp
-    src/ProductList.cpp
-    src/Database.cpp
+  src/main.cpp
+  src/Product.cpp
+  src/ProductList.cpp
+  src/Database.cpp
+  src/Menu.cpp
 )
 
 # Add GoogleTest

@@ -2,68 +2,34 @@
 #include <fstream>
 #include <iostream>
 
-Database::Database(const std::string &filename) : source(filename) {}
+// Written by Rohan Poudel
+Database::Database(const std::string &filename) : sourceFile(filename) {}
 
-Database::~Database() {}
-
-void Database::loadProducts(ProductList &productList)
-{
-  loadFromTextFile(productList);
-}
-
+// Generated with AI assistance (ChatGPT)
 void Database::saveProducts(const ProductList &productList)
 {
-  saveToTextFile(productList);
-}
-
-void Database::loadFromTextFile(ProductList &productList)
-{
-  std::ifstream inFile(source);
-  if (!inFile)
+  // Open the file in append mode
+  std::ofstream outFile(sourceFile, std::ios::app);
+  if (!outFile) // Error handling: Check if file is open
   {
-    std::ofstream createFile(source);
-    if (!createFile)
-    {
-      std::cerr << "Unable to create file: " << source << std::endl;
-      return;
-    }
-    createFile.close();
-    inFile.open(source);
-    if (!inFile)
-    {
-      std::cerr << "Unable to open file: " << source << std::endl;
-      return;
-    }
-  }
-  std::string name;
-  double price;
-  int quantity;
-
-  while (inFile >> name >> price >> quantity)
-  {
-    Product newProduct(name, price, quantity);
-    productList.addProduct(newProduct);
-  }
-
-  inFile.close();
-}
-
-void Database::saveToTextFile(const ProductList &productList)
-{
-  std::ofstream outFile(source);
-  if (!outFile)
-  {
-    std::cerr << "Unable to open file: " << source << std::endl;
+    std::cerr << "Unable to open file: " << sourceFile << std::endl;
     return;
   }
+
+  // Get the head of the ProductList
   ProductList::Node *temp = productList.getHead();
+
+  // Traverse the linked list and write each product to the file
+  // Code refactored by AI (ChatGPT)
   while (temp != nullptr)
   {
-    outFile << temp->product.getName() << ","
-            << temp->product.getPrice() << ","
-            << temp->product.getQuantity() << std::endl;
-    temp = temp->next;
+    outFile << temp->product.getName() << ","  // Write product name
+            << temp->product.getPrice() << "," // Write product price
+            << temp->product.getQuantity()     // Write product quantity
+            << std::endl;
+    temp = temp->next; // Move to the next node in the list
   }
 
+  // Close the file after writing
   outFile.close();
 }

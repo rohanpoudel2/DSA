@@ -6,5 +6,6 @@ if [ ! -d "build" ]; then
 fi
 
 # Run CMake and build the project
-cmake -S . -B build
-cmake --build build
+cd build
+cmake ..
+cmake --build .
