@@ -5,8 +5,16 @@
 #include <string>
 #include <limits>
 
-// Generated with AI assistance (ChatGPT)
-// I wanted to create a template function to follow DRY rule
+// Function to handle input failure
+void handleInputFailure()
+{
+  using namespace std;
+  cin.clear();
+  cin.ignore(numeric_limits<streamsize>::max(), '\n');
+  cout << "Invalid input. Please enter the correct type." << endl;
+}
+
+// Function template for input validation
 template <typename T>
 void promptForInput(const std::string &prompt_message, T &input)
 {
@@ -20,14 +28,12 @@ void promptForInput(const std::string &prompt_message, T &input)
     // Check if the input failed (wrong type)
     if (cin.fail())
     {
-      cin.clear();                                         // Clear the error flag
-      cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Ignore the invalid input
-      cout << "Invalid input. Please enter the correct type." << endl;
+      handleInputFailure();
     }
     else
     {
-      cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear the input buffer
-      break;                                               // Valid input, break out of the loop
+      cin.ignore(numeric_limits<streamsize>::max(), '\n');
+      break;
     }
   }
 }
@@ -48,12 +54,12 @@ void Menu::AddNewProduct()
 
   std::cout << "Product added: " << product_name << ", Price: " << product_price << ", Quantity: " << product_quantity << std::endl;
 
-  Product newProduct(product_name, product_price, product_quantity); // Create a new product
-  ProductList productList;                                           // Create a new product list
-  Database db("./data/products.txt");                                // Create a database object for saving products
+  Product newProduct(product_name, product_price, product_quantity);
+  ProductList productList;
+  Database db("./data/products.txt");
 
-  productList.addProduct(newProduct); // Add the product to the product list
-  db.saveProducts(productList);       // Save the product list to the database
+  productList.addProduct(newProduct);
+  db.saveProducts(productList);
 }
 
 // Written by Rohan Poudel
@@ -76,10 +82,13 @@ void Menu::ExitMenu()
 }
 
 // Written by Rohan Poudel
-Menu::Menu() : menu_options({{"Add new product", {1, AddNewProduct}},
-                             {"View all products", {2, ViewAllProducts}},
-                             {"Find a product", {3, FindProduct}},
-                             {"Exit", {4, ExitMenu}}}) {}
+Menu::Menu()
+{
+  menu_options = {{{1, "Add new product", AddNewProduct},
+                   {2, "View all products", ViewAllProducts},
+                   {3, "Find a product", FindProduct},
+                   {4, "Exit", ExitMenu}}};
+}
 
 // Written by Rohan Poudel
 void Menu::displayMenu() const
@@ -87,38 +96,46 @@ void Menu::displayMenu() const
   std::cout << "===============================" << std::endl;
   std::cout << "       E-commerce Store" << std::endl;
   std::cout << "===============================" << std::endl;
-  for (const auto &option : menu_options) // Loop through the menu options and display them
+  for (const auto &option : menu_options)
   {
-    std::cout << std::get<0>(option.second) << ". " << option.first << std::endl;
+    std::cout << std::get<0>(option) << ". " << std::get<1>(option) << std::endl;
   }
   std::cout << "===============================" << std::endl;
   std::cout << "Enter your choice: ";
 }
 
 // Written by Rohan Poudel
-int Menu::processOption() const
+void Menu::processOption() const
 {
   using namespace std;
 
-  int option;
-  cin >> option;
+  int choice;
+  cin >> choice;
 
-  for (const auto &opt : menu_options) // Loop through the menu options
+  if (cin.fail())
   {
-    if (get<0>(opt.second) == option) // Check if the selected option matches
+    handleInputFailure();
+    return;
+  }
+
+  for (const auto &option : menu_options)
+  {
+    if (get<0>(option) == choice)
     {
-      get<1>(opt.second)(); // Execute the corresponding function
-      return 1;
+      get<2>(option)();
+      return;
     }
   }
 
   cout << "Invalid option!" << endl;
-  return 0;
 }
 
 // Written by Rohan Poudel
 void Menu::startMenu() const
 {
-  displayMenu();   // Display the menu
-  processOption(); // Process the selected option
+  while (true)
+  {
+    displayMenu();
+    processOption();
+  }
 }
