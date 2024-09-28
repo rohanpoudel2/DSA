@@ -9,7 +9,8 @@
 class Menu
 {
 private:
-  // Use an array to store the menu options in a tuple (MenuOption, string, function)
+  // Array to store the menu options: each option consists of an int (option number),
+  // a string (menu description), and a function (corresponding action to be executed)
   std::array<std::tuple<int, std::string, std::function<void()>>, 4> menu_options;
 
 public:
@@ -34,9 +35,24 @@ public:
   void startMenu() const;
 
   // Additional Menu-specific functionality
+  // Function to add a new product to the product list
+  // Precondition: User must input valid product details (name, price, quantity)
+  // Postcondition: The new product is added to the product list and saved to the database
   static void AddNewProduct();
+
+  // Function to view all products (currently a placeholder)
+  // Precondition: None
+  // Postcondition: Displays a message indicating viewing functionality
   static void ViewAllProducts();
+
+  // Function to find a specific product (currently a placeholder)
+  // Precondition: None
+  // Postcondition: Displays a message indicating the search functionality
   static void FindProduct();
+
+  // Function to exit the menu
+  // Precondition: None
+  // Postcondition: Terminates the program
   static void ExitMenu();
 };
 

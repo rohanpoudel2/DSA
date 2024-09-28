@@ -45,19 +45,10 @@ void ProductList::addProduct(const Product &newProduct)
 // Written by Rohan Poudel
 void ProductList::displayAllProducts() const
 {
-  Node *temp = head;
-  if (temp == nullptr) // Check if the list is empty
+  Node *current = head;
+  while (current != nullptr)
   {
-    std::cout << "No products in the store." << std::endl;
-  }
-  else
-  {
-    // Traverse the list and print product details
-    while (temp != nullptr)
-    {
-      temp->product.displayProduct();
-      std::cout << "----------------------" << std::endl;
-      temp = temp->next;
-    }
+    current->product.displayProduct();
+    current = current->next;
   }
 }

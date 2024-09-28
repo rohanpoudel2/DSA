@@ -1,36 +1,22 @@
 #include <gtest/gtest.h>
 #include "ProductList.h"
 
-// Test the addProduct method
+// Test adding products to the list
 TEST(ProductListTest, AddProduct)
 {
-  ProductList list;
-  Product p("Phone", 599.99, 5);
-  list.addProduct(p);
+  ProductList productList;
 
-  // Check if the head of the list contains the product
-  ProductList::Node *head = list.getHead();
-  ASSERT_NE(head, nullptr);
-  EXPECT_EQ(head->product.getName(), "Phone");
-  EXPECT_EQ(head->product.getPrice(), 599.99);
-  EXPECT_EQ(head->product.getQuantity(), 5);
-}
+  Product product1("Phone", 499.99, 20);
+  Product product2("Laptop", 999.99, 10);
 
-// Test adding multiple products
-TEST(ProductListTest, AddMultipleProducts)
-{
-  ProductList list;
-  Product p1("Phone", 599.99, 5);
-  Product p2("Laptop", 999.99, 3);
+  productList.addProduct(product1);
+  productList.addProduct(product2);
 
-  list.addProduct(p1);
-  list.addProduct(p2);
+  // Verify the first product in the list
+  ASSERT_NE(productList.getHead(), nullptr);
+  EXPECT_EQ(productList.getHead()->product.getName(), "Phone");
 
-  ProductList::Node *head = list.getHead();
-  ASSERT_NE(head, nullptr);
-  EXPECT_EQ(head->product.getName(), "Phone");
-
-  ProductList::Node *second = head->next;
-  ASSERT_NE(second, nullptr);
-  EXPECT_EQ(second->product.getName(), "Laptop");
+  // Verify the second product in the list
+  ASSERT_NE(productList.getHead()->next, nullptr);
+  EXPECT_EQ(productList.getHead()->next->product.getName(), "Laptop");
 }

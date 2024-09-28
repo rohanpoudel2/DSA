@@ -37,9 +37,9 @@ public:
   // Postcondition: Adds a new node with the product at the end of the list
   void addProduct(const Product &newProduct);
 
-  // Displays all products in the linked list
+  // Displays all the products in the linked list
   // Precondition: None
-  // Postcondition: Prints the details of each product in the list
+  // Postcondition: Prints each product in the list to standard output
   void displayAllProducts() const;
 };
 

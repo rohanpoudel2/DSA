@@ -31,17 +31,17 @@ If you prefer running the project using Docker, only **Docker** is required.
 
 ### Option 1: Running Without Docker
 
-1. **Build the project**:
+1. **Build the project if you don't want to run the project**:
    ```bash
    ./build.sh
    ```
 
-2. **Run the project**:
+2. **Run the project this will also build the project**:
    ```bash
    ./run.sh
    ```
 
-3. **Run the tests**:
+3. **Run the tests this will also build the project**:
    ```bash
    ./run_tests.sh
    ```
@@ -53,12 +53,12 @@ If you prefer running the project using Docker, only **Docker** is required.
    docker build -t ecommerce_store_image .
    ```
 
-2. **Run the project**:
+2. **Run the project this will also build the project**:
    ```bash
    docker run --rm -it ecommerce_store_image
    ```
 
-3. **Run the tests**:
+3. **Run the tests this will also build the project**:
    ```bash
    docker run --rm ecommerce_store_image ./run_tests.sh
    ```

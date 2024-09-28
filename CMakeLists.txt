@@ -41,12 +41,16 @@ enable_testing()
 add_executable(runTests
     tests/test_product.cpp
     tests/test_productlist.cpp
+    tests/test_database.cpp
+    tests/test_menu.cpp
     src/Product.cpp
     src/ProductList.cpp
+    src/Database.cpp
+    src/Menu.cpp
 )
 
 # Link GoogleTest with the test executable
-target_link_libraries(runTests gtest gtest_main)
+target_link_libraries(runTests gtest gtest_main gmock gmock_main)
 
 # Add tests
 add_test(NAME ProductTests COMMAND runTests)
