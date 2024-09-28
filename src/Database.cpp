@@ -1,16 +1,22 @@
 #include "Database.h"
 #include <fstream>
 #include <iostream>
+#include <filesystem>
 
 // Written by Rohan Poudel
 Database::Database(const std::string &filename) : sourceFile(filename) {}
 
 // Generated with AI assistance (ChatGPT)
+// Saves the product list to the file, creating the file and directory if necessary
 void Database::saveProducts(const ProductList &productList)
 {
-  // Open the file in append mode
+  // Create the directory path if it doesn't exist
+  std::filesystem::path filePath(sourceFile);
+  std::filesystem::create_directories(filePath.parent_path());
+
+  // Open the file in append mode (creates the file if it doesn't exist)
   std::ofstream outFile(sourceFile, std::ios::app);
-  if (!outFile) // Error handling: Check if file is open
+  if (!outFile) // Error handling: Check if the file is successfully opened
   {
     std::cerr << "Unable to open file: " << sourceFile << std::endl;
     return;
