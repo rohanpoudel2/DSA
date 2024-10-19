@@ -32,15 +32,25 @@ public:
   // Postcondition: Returns a pointer to the first node (head) in the list
   Node *getHead() const;
 
-  // Adds a product to the end of the linked list
+  // Pushes a product onto the head of the stack
   // Precondition: newProduct is a valid Product object
-  // Postcondition: Adds a new node with the product at the end of the list
-  void addProduct(const Product &newProduct);
+  // Postcondition: A new node is created at the head of the list with the product
+  void pushProduct(const Product &newProduct);
+
+  // Pops a product from the head of the stack
+  // Precondition: The list is not empty
+  // Postcondition: The product at the head of the list is removed and returned
+  Product popProduct();
 
   // Displays all the products in the linked list
   // Precondition: None
   // Postcondition: Prints each product in the list to standard output
   void displayAllProducts() const;
+
+  // Checks if the stack is empty
+  // Precondition: None
+  // Postcondition: Returns true if the list is empty, false otherwise
+  bool isEmpty() const;
 };
 
 #endif

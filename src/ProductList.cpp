@@ -23,32 +23,46 @@ ProductList::Node *ProductList::getHead() const
 }
 
 // Written by Rohan Poudel
-void ProductList::addProduct(const Product &newProduct)
+void ProductList::pushProduct(const Product &newProduct)
 {
-  Node *newNode = new Node{newProduct, nullptr}; // Create a new node with the product
-  if (head == nullptr)                           // If the list is empty
+  Node *newNode = new Node{newProduct, nullptr};
+  newNode->next = head;
+  head = newNode;
+}
+
+// Written by Rohan Poudel
+Product ProductList::popProduct()
+{
+  if (head == nullptr)
   {
-    head = newNode;
+    std::cerr << "No products to pop!" << std::endl;
+    return Product(); // Return a default-constructed Product
   }
-  else
-  {
-    Node *temp = head;
-    // Traverse to the end of the list
-    while (temp->next != nullptr)
-    {
-      temp = temp->next;
-    }
-    temp->next = newNode; // Append the new node
-  }
+  Node *temp = head;
+  Product poppedProduct = head->product;
+  head = head->next;
+  delete temp;
+
+  return poppedProduct;
 }
 
 // Written by Rohan Poudel
 void ProductList::displayAllProducts() const
 {
   Node *current = head;
+  if (current == nullptr)
+  {
+    std::cout << "No products to display!" << std::endl;
+    return;
+  }
   while (current != nullptr)
   {
     current->product.displayProduct();
     current = current->next;
   }
+}
+
+bool ProductList::isEmpty() const
+{
+  return head == nullptr;
 }

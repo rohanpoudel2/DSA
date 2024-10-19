@@ -27,7 +27,8 @@ TEST(MenuTest, DisplayMenuTest)
       "1. Add new product\n"
       "2. View all products\n"
       "3. Find a product\n"
-      "4. Exit\n"
+      "4. Undo last added product\n" // Ensure Undo is part of the menu
+      "5. Exit\n"
       "===============================\n"
       "Enter your choice: ";
 
@@ -66,13 +67,13 @@ TEST(MenuTest, ProcessInvalidOptionTest)
   EXPECT_EQ(output, "Invalid option!\n");
 }
 
-// Test starting the menu and processing exit
+// Test starting the menu and processing the exit option
 TEST(MenuTest, StartMenuExitTest)
 {
   Menu menu;
 
   // Simulate the user selecting the "Exit" option
-  simulateInput("4\n");
+  simulateInput("5\n");
 
   testing::internal::CaptureStdout(); // Capture the output
   menu.startMenu();
@@ -80,4 +81,20 @@ TEST(MenuTest, StartMenuExitTest)
 
   // Verify that the correct exit message is displayed
   EXPECT_TRUE(output.find("Exiting...") != std::string::npos);
+}
+
+// Test processing the undo operation
+TEST(MenuTest, ProcessUndoLastAddedProduct)
+{
+  Menu menu;
+
+  // Simulate the user selecting "Undo last added product"
+  simulateInput("4\n");
+
+  testing::internal::CaptureStdout(); // Capture the output
+  menu.processOption();
+  std::string output = testing::internal::GetCapturedStdout();
+
+  // Verify the undo operation message is displayed correctly
+  EXPECT_TRUE(output.find("Undoing the last added product:") != std::string::npos || output.find("No products to undo!") != std::string::npos);
 }

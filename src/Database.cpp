@@ -2,51 +2,49 @@
 #include <fstream>
 #include <iostream>
 #include <filesystem>
-#include <string>
 #include <sstream>
 
-// Written by Rohan Poudel
+// Constructor initializes the database with the given file path
 Database::Database(const std::string &filename) : sourceFile(filename) {}
 
-// Generated with AI assistance (ChatGPT)
-// Saves the product list to the file, creating the file and directory if necessary
+// Save only the top product to the file (stack-like behavior)
 void Database::saveProducts(const ProductList &productList, const std::string &mode)
 {
-  // Create the directory path if it doesn't exist
-  std::filesystem::path filePath(sourceFile);
-  std::filesystem::create_directories(filePath.parent_path());
-
-  // Open the file in append mode (creates the file if it doesn't exist)
-  std::ofstream outFile(sourceFile, mode == "append" ? std::ios::app : std::ios::trunc);
-  if (!outFile) // Error handling: Check if the file is successfully opened
+  std::ofstream outFile(sourceFile, mode == "replace" ? std::ios::trunc : std::ios::app);
+  if (!outFile)
   {
     std::cerr << "Unable to open file: " << sourceFile << std::endl;
     return;
   }
 
-  // Get the head of the ProductList
-  ProductList::Node *temp = productList.getHead();
-
-  // Traverse the linked list and write each product to the file
-  // Code refactored by AI (ChatGPT)
-  while (temp != nullptr)
+  // If appending, only save the top product
+  if (mode == "append" && productList.getHead() != nullptr)
   {
-    outFile << temp->product.getName() << ","  // Write product name
-            << temp->product.getPrice() << "," // Write product price
-            << temp->product.getQuantity()     // Write product quantity
-            << std::endl;
-    temp = temp->next; // Move to the next node in the list
+    ProductList::Node *topProduct = productList.getHead();
+    outFile << topProduct->product.getName() << ","
+            << topProduct->product.getPrice() << ","
+            << topProduct->product.getQuantity() << std::endl;
   }
 
-  // Close the file after writing
+  // If replacing, save all products in the stack
+  else if (mode == "replace")
+  {
+    ProductList::Node *temp = productList.getHead();
+    while (temp != nullptr)
+    {
+      outFile << temp->product.getName() << ","
+              << temp->product.getPrice() << ","
+              << temp->product.getQuantity() << std::endl;
+      temp = temp->next;
+    }
+  }
+
   outFile.close();
 }
 
-// Generated with AI assistance (ChatGPT)
-// Load products from a text file into a ProductList
+// Load all products from the file and push them onto the stack (one by one)
 void Database::loadProducts(ProductList &productList)
 {
-  // Check if the file exists using std::filesystem
   if (!std::filesystem::exists(sourceFile))
   {
     std::cerr << "File not found: " << sourceFile << std::endl;
@@ -63,19 +61,19 @@ void Database::loadProducts(ProductList &productList)
   std::string line;
   while (std::getline(inFile, line))
   {
-    std::stringstream ss(line); // Use stringstream to parse the line
+    std::stringstream ss(line); // Parse the line
     std::string name;
     double price;
     int quantity;
     char delimiter;
 
-    // Parse the product details from the line (comma-separated values)
+    // Parse the product data
     std::getline(ss, name, ',');
     ss >> price >> delimiter >> quantity;
 
-    // Add the parsed product to the product list
+    // Add the parsed product to the stack
     Product newProduct(name, price, quantity);
-    productList.addProduct(newProduct);
+    productList.pushProduct(newProduct); // Push to the stack
   }
 
   inFile.close();

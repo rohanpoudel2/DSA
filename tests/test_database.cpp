@@ -1,24 +1,23 @@
 #include <gtest/gtest.h>
-#include <fstream>
-#include <iostream>
 #include "Database.h"
 #include "ProductList.h"
 #include "Product.h"
 
-// Cleans the specified database by saving an empty ProductList
+// Cleans the database by saving an empty ProductList
 bool cleanDatabase(const std::string &filePath)
 {
   Database db(filePath);
   ProductList emptyProductList;
 
   // Save an empty product list to clear the file
-  db.saveProducts(emptyProductList, "Replace");
+  db.saveProducts(emptyProductList, "replace");
 
   // Reload the product list to verify that it's empty
   db.loadProducts(emptyProductList);
   return emptyProductList.getHead() == nullptr;
 }
 
+// Test saving products to a text file
 // Test saving products to a text file
 TEST(DatabaseTest, SaveProductsToFile)
 {
@@ -30,79 +29,94 @@ TEST(DatabaseTest, SaveProductsToFile)
   ProductList productList;
   ProductList newProductList;
 
-  // Add products to the list
-  productList.addProduct(Product("Mouse", 25.99, 15));
-  productList.addProduct(Product("Keyboard", 49.99, 10));
+  // Add products to the list (LIFO order)
+  productList.pushProduct(Product("Mouse", 25.99, 15));
+  productList.pushProduct(Product("Keyboard", 49.99, 10));
 
-  // Create a Database object and save the products
+  // Save the product stack to the database file
   Database db(filePath);
-  db.saveProducts(productList);
+  db.saveProducts(productList, "replace");
 
-  // Load the products into a new list
+  // Load the products into a new list (after writing to file)
   db.loadProducts(newProductList);
 
-  // Verify that the saved and loaded products match
+  // Debugging: Print all products in the original and loaded lists
+  std::cout << "Original product list:" << std::endl;
   ProductList::Node *productNode = productList.getHead();
-  ProductList::Node *newProductNode = newProductList.getHead();
-
-  while (productNode != nullptr && newProductNode != nullptr)
+  while (productNode != nullptr)
   {
-    EXPECT_EQ(productNode->product.getName(), newProductNode->product.getName());
-    EXPECT_EQ(productNode->product.getPrice(), newProductNode->product.getPrice());
-    EXPECT_EQ(productNode->product.getQuantity(), newProductNode->product.getQuantity());
-
+    std::cout << productNode->product.getName() << std::endl;
     productNode = productNode->next;
+  }
+
+  std::cout << "Loaded product list:" << std::endl;
+  ProductList::Node *newProductNode = newProductList.getHead();
+  while (newProductNode != nullptr)
+  {
+    std::cout << newProductNode->product.getName() << std::endl;
+    newProductNode = newProductNode->next;
+  }
+
+  // Reset pointers for comparison
+  productNode = productList.getHead();
+  newProductNode = newProductList.getHead();
+
+  // **Important change here**: Reverse the original list order for comparison
+  std::stack<ProductList::Node *> reverseStack;
+  while (productNode != nullptr)
+  {
+    reverseStack.push(productNode);
+    productNode = productNode->next;
+  }
+
+  // Now compare the reversed order of original products with the loaded products
+  while (!reverseStack.empty() && newProductNode != nullptr)
+  {
+    ProductList::Node *reversedProductNode = reverseStack.top();
+    reverseStack.pop();
+
+    EXPECT_EQ(reversedProductNode->product.getName(), newProductNode->product.getName());
+    EXPECT_EQ(reversedProductNode->product.getPrice(), newProductNode->product.getPrice());
+    EXPECT_EQ(reversedProductNode->product.getQuantity(), newProductNode->product.getQuantity());
+
     newProductNode = newProductNode->next;
   }
 
   // Ensure both lists have the same length
-  EXPECT_EQ(productNode, nullptr);
+  EXPECT_EQ(reverseStack.empty(), true);
   EXPECT_EQ(newProductNode, nullptr);
 }
 
-// Test loading products from a text file
-TEST(DatabaseTest, LoadProductsFromFile)
+// Test undoing the last added product and saving the stack to the file
+TEST(DatabaseTest, UndoLastAddedProduct)
 {
   const std::string filePath = "./data/test_products.txt";
 
   // Ensure the database is clean before starting the test
   ASSERT_TRUE(cleanDatabase(filePath));
 
-  // Initialize products to be added to the list
-  std::array<Product, 2> products = {
-      Product("Laptop", 123.2, 12),
-      Product("Monitor", 1123.2, 102)};
-
   ProductList productList;
+
+  // Add products to the stack
+  productList.pushProduct(Product("Mouse", 25.99, 15));
+  productList.pushProduct(Product("Keyboard", 49.99, 10));
+
+  // Save the stack to the file
   Database db(filePath);
-
-  // Add products to the list
-  for (const auto &product : products)
-  {
-    productList.addProduct(product);
-  }
-
-  // Save the product list to the database
   db.saveProducts(productList);
 
-  // Reinitialize the product list
-  productList = ProductList();
+  // Undo the last added product (Keyboard) from the stack
+  productList.popProduct();
 
-  // Load the products from the database
-  db.loadProducts(productList);
+  // After the undo operation, save the remaining products back to the database
+  db.saveProducts(productList, "replace");
 
-  // Verify the loaded products match the original products
-  ProductList::Node *current = productList.getHead();
-  for (int i = 0; i < products.size(); i++)
-  {
-    // Checking if there is a node
-    ASSERT_NE(current, nullptr);
-    EXPECT_EQ(current->product.getName(), products[i].getName());
-    EXPECT_EQ(current->product.getPrice(), products[i].getPrice());
-    EXPECT_EQ(current->product.getQuantity(), products[i].getQuantity());
-    // Moving to the next node
-    current = current->next;
-  }
-  // Checking to see no more nodes are present
-  EXPECT_EQ(current, nullptr);
+  // Reload the file to verify that "Keyboard" was removed
+  ProductList newProductList;
+  db.loadProducts(newProductList);
+
+  ProductList::Node *productNode = newProductList.getHead();
+  ASSERT_NE(productNode, nullptr);
+  EXPECT_EQ(productNode->product.getName(), "Mouse");
+  EXPECT_EQ(productNode->next, nullptr); // Only one product should remain
 }

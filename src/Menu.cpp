@@ -46,6 +46,8 @@ void promptForInput(const std::string &prompt_message, T &input)
   }
 }
 
+ProductList productStack;
+
 // Written by Rohan Poudel
 void Menu::AddNewProduct()
 {
@@ -58,24 +60,39 @@ void Menu::AddNewProduct()
   promptForInput("Enter product quantity: ", product_quantity);
 
   Product newProduct(product_name, product_price, product_quantity); // Create a new product object
-  ProductList productList;                                           // Initialize the product list
-  Database db("./data/products.txt");                                // Initialize the database to save the product
 
-  productList.addProduct(newProduct); // Add the product to the list
-  db.saveProducts(productList);       // Save the updated list to the database
+  Database db("./data/products.txt"); // Initialize the database to save the product
+
+  productStack.pushProduct(newProduct);    // Add the product to the list
+  db.saveProducts(productStack, "append"); // Save the updated list to the database
 
   std::cout << "Adding a new product..." << std::endl;
   newProduct.displayProduct();
 }
 
 // Written by Rohan Poudel
+void Menu::UndoLastAddedProduct()
+{
+  using namespace std;
+  if (!productStack.isEmpty())
+  {
+    Product removedProduct = productStack.popProduct();
+    cout << "Undoing the last added product:" << removedProduct.getName() << endl;
+
+    Database db("./data/products.txt");
+    db.saveProducts(productStack, "replace");
+  }
+  else
+  {
+    cout << "No products to undo!" << endl;
+  }
+}
+
+// Written by Rohan Poudel
 void Menu::ViewAllProducts()
 {
   std::cout << "Viewing all products..." << std::endl;
-  ProductList productList;
-  Database db("./data/products.txt");
-  db.loadProducts(productList);
-  productList.displayAllProducts();
+  productStack.displayAllProducts();
 }
 
 // Written by Rohan Poudel
@@ -97,7 +114,11 @@ Menu::Menu()
   menu_options = {{{1, "Add new product", AddNewProduct},
                    {2, "View all products", ViewAllProducts},
                    {3, "Find a product", FindProduct},
-                   {4, "Exit", ExitMenu}}};
+                   {4, "Undo last added product", UndoLastAddedProduct},
+                   {5, "Exit", ExitMenu}}};
+
+  Database db("./data/products.txt");
+  db.loadProducts(productStack);
 }
 
 // Written by Rohan Poudel

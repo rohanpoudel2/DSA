@@ -11,7 +11,7 @@ class Menu
 private:
   // Array to store the menu options: each option consists of an int (option number),
   // a string (menu description), and a function (corresponding action to be executed)
-  std::array<std::tuple<int, std::string, std::function<void()>>, 4> menu_options;
+  std::array<std::tuple<int, std::string, std::function<void()>>, 5> menu_options;
 
 public:
   // Default constructor
@@ -39,6 +39,11 @@ public:
   // Precondition: User must input valid product details (name, price, quantity)
   // Postcondition: The new product is added to the product list and saved to the database
   static void AddNewProduct();
+
+  // Function to undo the last added product from the stack
+  // Precondition: The product stack must not be empty
+  // Postcondition: The last added product is removed from the stack
+  static void UndoLastAddedProduct();
 
   // Function to view all products (currently a placeholder)
   // Precondition: None
