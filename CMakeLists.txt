@@ -5,7 +5,7 @@ project(EcommerceStore)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON) # Ensure C++17 is strictly enforced
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Include directories for headers
 include_directories(include)
@@ -19,8 +19,17 @@ add_executable(EcommerceStore
   src/Product.cpp
   src/ProductList.cpp
   src/Database.cpp
+  src/InquiryQueue.cpp
+  src/User.cpp
   src/Menu.cpp
 )
+
+# Find and include SQLite3
+find_package(SQLite3 REQUIRED)
+include_directories(${SQLite3_INCLUDE_DIRS})
+
+# Link the main executable with the sqlite3 library
+target_link_libraries(EcommerceStore PRIVATE sqlite3)
 
 # Add GoogleTest
 include(FetchContent)
@@ -46,11 +55,13 @@ add_executable(runTests
     src/Product.cpp
     src/ProductList.cpp
     src/Database.cpp
+    src/InquiryQueue.cpp
+    src/User.cpp
     src/Menu.cpp
 )
 
-# Link GoogleTest with the test executable
-target_link_libraries(runTests gtest gtest_main gmock gmock_main)
+# Link GoogleTest and sqlite3 with the test executable
+target_link_libraries(runTests gtest gtest_main gmock gmock_main pthread sqlite3)
 
 # Add tests
 add_test(NAME ProductTests COMMAND runTests)

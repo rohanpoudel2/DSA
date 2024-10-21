@@ -5,60 +5,50 @@
 #include <array>
 #include <functional>
 #include <tuple>
+#include "User.h"
+#include "Database.h"
+#include "../utils/Utilities.h"
 
 class Menu
 {
 private:
   // Array to store the menu options: each option consists of an int (option number),
   // a string (menu description), and a function (corresponding action to be executed)
-  std::array<std::tuple<int, std::string, std::function<void()>>, 5> menu_options;
+  std::array<std::tuple<int, std::string, std::function<void()>>, 6> menu_options;
+
+  Database db;
+  User currentUser;
 
 public:
-  // Default constructor
-  // Precondition: None
-  // Postcondition: Initializes the menu with default options (e.g., Add Product, View Products, Exit)
+  // Constructor to initialize the menu with user-based options
   Menu();
 
   // Displays the menu to the user
-  // Precondition: None
-  // Postcondition: Outputs the menu options to the console
   void displayMenu() const;
 
   // Processes the user's menu option choice
-  // Precondition: User provides input as an integer corresponding to a menu option
-  // Postcondition: Executes the function associated with the chosen menu option or displays an error if invalid
   void processOption() const;
 
-  // Starts the menu, displaying options and processing user input
-  // Precondition: None
-  // Postcondition: Displays the menu and processes the user's choice in a loop
-  void startMenu() const;
+  // Starts the menu and processes user input
+  void startMenu();
 
-  // Additional Menu-specific functionality
-  // Function to add a new product to the product list
-  // Precondition: User must input valid product details (name, price, quantity)
-  // Postcondition: The new product is added to the product list and saved to the database
-  static void AddNewProduct();
+  // Function to prompt the login of a user
+  void Login();
 
-  // Function to undo the last added product from the stack
-  // Precondition: The product stack must not be empty
-  // Postcondition: The last added product is removed from the stack
-  static void UndoLastAddedProduct();
+  // Admin functions
+  void AddNewProduct();
+  void ViewAllProducts();
+  void UndoLastAddedProduct();
 
-  // Function to view all products (currently a placeholder)
-  // Precondition: None
-  // Postcondition: Displays a message indicating viewing functionality
-  static void ViewAllProducts();
+  // Customer-specific functions
+  void AddNewInquiry();
+  void ProcessInquiry();
+  void ViewInquiries();
 
-  // Function to find a specific product (currently a placeholder)
-  // Precondition: None
-  // Postcondition: Displays a message indicating the search functionality
-  static void FindProduct();
+  void clearConsole() const;
 
   // Function to exit the menu
-  // Precondition: None
-  // Postcondition: Terminates the program
-  static void ExitMenu();
+  void ExitMenu();
 };
 
 #endif
