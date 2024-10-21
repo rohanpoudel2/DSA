@@ -5,9 +5,11 @@
 #include <array>
 #include <functional>
 #include <tuple>
+#include "UserManager.h"
+#include "ProductManager.h"
+#include "InquiryManager.h"
 #include "User.h"
-#include "Database.h"
-#include "../utils/Utilities.h"
+#include "ProductList.h"
 
 class Menu
 {
@@ -16,8 +18,12 @@ private:
   // a string (menu description), and a function (corresponding action to be executed)
   std::array<std::tuple<int, std::string, std::function<void()>>, 6> menu_options;
 
-  Database db;
-  User currentUser;
+  UserManager userManager;       // Manages user operations
+  ProductManager productManager; // Manages product operations
+  InquiryManager inquiryManager; // Manages inquiry operations
+
+  User currentUser;         // The currently logged-in user
+  ProductList productStack; // Stack of products
 
 public:
   // Constructor to initialize the menu with user-based options
@@ -44,8 +50,6 @@ public:
   void AddNewInquiry();
   void ProcessInquiry();
   void ViewInquiries();
-
-  void clearConsole() const;
 
   // Function to exit the menu
   void ExitMenu();

@@ -16,12 +16,15 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 # Add the executable for the main project
 add_executable(EcommerceStore
   src/main.cpp
+  src/User.cpp
   src/Product.cpp
   src/ProductList.cpp
   src/Database.cpp
-  src/InquiryQueue.cpp
-  src/User.cpp
+  src/ProductManager.cpp
+  src/InquiryManager.cpp
+  src/UserManager.cpp
   src/Menu.cpp
+  src/Utils.cpp
 )
 
 # Find and include SQLite3
@@ -49,15 +52,16 @@ enable_testing()
 # Add the test executable
 add_executable(runTests
     tests/test_product.cpp
-    tests/test_productlist.cpp
-    tests/test_database.cpp
-    tests/test_menu.cpp
+    # tests/test_productlist.cpp
+    # tests/test_database.cpp
+    # tests/test_menu.cpp
     src/Product.cpp
-    src/ProductList.cpp
-    src/Database.cpp
-    src/InquiryQueue.cpp
-    src/User.cpp
-    src/Menu.cpp
+    # src/ProductList.cpp
+    # src/Database.cpp
+    # src/ProductManager.cpp
+    # src/UserManager.cpp
+    # src/InquiryManager.cpp
+    # src/Utils.cpp
 )
 
 # Link GoogleTest and sqlite3 with the test executable

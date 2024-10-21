@@ -1,49 +1,11 @@
 #include "Menu.h"
-#include "ProductList.h"
-#include "Database.h"
+#include "Utils.h"
 
-#include <string>
-#include <limits>
-#include <iostream>
-#include <sstream>
-#include <functional> // For std::hash
-
-ProductList productStack;
-InquiryQueue inquiryQueue;
-Database db("./data/store.db");
-
-// Handles input failures by clearing the error state and ignoring invalid input
-bool handleInputFailure(std::istream &stream)
-{
-  if (stream.fail())
-  {
-    stream.clear();
-    stream.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    std::cout << "Invalid input. Please enter the correct type." << std::endl;
-    return true;
-  }
-  else
-  {
-    stream.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    return false;
-  }
-}
-
-// Function template for input validation
-template <typename T>
-void promptForInput(const std::string &prompt_message, T &input)
-{
-  while (true)
-  {
-    std::cout << prompt_message;
-    std::cin >> input;
-    if (!handleInputFailure(std::cin))
-      break;
-  }
-}
-
-// Menu constructor
-Menu::Menu() : db("./data/store.db"), currentUser() // Initialize currentUser with default constructor
+Menu::Menu()
+    : userManager("./data/store.db"),
+      productManager("./data/store.db"),
+      inquiryManager("./data/store.db"),
+      currentUser() // Initialize currentUser
 {
   Login(); // Prompt user to log in
 
@@ -62,12 +24,11 @@ Menu::Menu() : db("./data/store.db"), currentUser() // Initialize currentUser wi
                      {4, "Exit", std::bind(&Menu::ExitMenu, this)}}};
   }
 
-  db.loadProducts(productStack); // Load any products from the database
+  productManager.loadProducts(productStack); // Load any products from the database
 }
 
 void Menu::displayMenu() const
 {
-  clearConsole();
   std::cout << "===============================" << std::endl;
   std::cout << "       E-commerce Store" << std::endl;
   std::cout << "===============================" << std::endl;
@@ -84,7 +45,7 @@ void Menu::processOption() const
   int choice;
   std::cin >> choice;
 
-  if (handleInputFailure(std::cin))
+  if (Utils::handleInputFailure(std::cin))
     return;
 
   for (const auto &option : menu_options)
@@ -108,7 +69,6 @@ void Menu::startMenu()
   }
 }
 
-// Handle login of user
 void Menu::Login()
 {
   std::string email, password;
@@ -118,31 +78,32 @@ void Menu::Login()
 
   if (roleOption == 1) // Admin login
   {
-    promptForInput("Enter admin password: ", password);
-    if (db.verifyAdminPassword(hashPassword(password)))
+    Utils::promptForInput("Enter admin password: ", password);
+    if (userManager.verifyAdminPassword(Utils::hashPassword(password), userManager.getDB())) // Admin password check with getDB()
     {
-      currentUser = User("Admin", "admin@store.com", "admin", password);
+      currentUser = User("Admin", "rohan@poudel.com", "admin", password);
       std::cout << "Admin access granted!" << std::endl;
     }
     else
     {
       std::cerr << "Invalid admin credentials!" << std::endl;
+      exit(1);
     }
   }
   else // Customer login
   {
-    promptForInput("Enter your email: ", email);
-    currentUser = db.getCustomerByEmail(email);
+    Utils::promptForInput("Enter your email: ", email);
+    currentUser = userManager.getCustomerByEmail(email, userManager.getDB()); // Customer lookup with getDB()
 
-    if (currentUser.getEmail().empty())
+    if (currentUser.getEmail().empty()) // New customer registration
     {
       std::string name;
-      promptForInput("Enter your name: ", name);
+      Utils::promptForInput("Enter your name: ", name);
       std::string plainPassword;
-      promptForInput("Enter your password: ", plainPassword);
+      Utils::promptForInput("Enter your password: ", plainPassword);
 
-      currentUser = User(name, email, "customer", hashPassword(plainPassword));
-      db.addUser(currentUser);
+      currentUser = User(name, email, "customer", Utils::hashPassword(plainPassword));
+      userManager.addUser(currentUser, userManager.getDB()); // Register new customer with getDB()
       std::cout << "Customer registered!" << std::endl;
     }
     else
@@ -152,24 +113,21 @@ void Menu::Login()
   }
 }
 
-// Admin functionality (Add product, Undo, View)
 void Menu::AddNewProduct()
 {
-  clearConsole();
   std::string product_name;
   double product_price;
   int product_quantity;
 
-  promptForInput("Enter product name: ", product_name);
-  promptForInput("Enter product price: ", product_price);
-  promptForInput("Enter product quantity: ", product_quantity);
+  Utils::promptForInput("Enter product name: ", product_name);
+  Utils::promptForInput("Enter product price: ", product_price);
+  Utils::promptForInput("Enter product quantity: ", product_quantity);
 
   Product newProduct(product_name, product_price, product_quantity);
-  productStack.pushProduct(newProduct);
-  db.saveProducts(productStack, "replace");
+  productStack.pushProduct(newProduct);                 // Add to stack
+  productManager.saveProducts(productStack, "replace"); // Save to database
 
-  std::cout << "Adding a new product..." << std::endl;
-  newProduct.displayProduct();
+  std::cout << "Added new product: " << product_name << std::endl;
 }
 
 void Menu::UndoLastAddedProduct()
@@ -178,7 +136,7 @@ void Menu::UndoLastAddedProduct()
   {
     Product removedProduct = productStack.popProduct();
     std::cout << "Undoing the last added product: " << removedProduct.getName() << std::endl;
-    db.saveProducts(productStack, "replace");
+    productManager.saveProducts(productStack, "replace"); // Update the database
   }
   else
   {
@@ -188,44 +146,36 @@ void Menu::UndoLastAddedProduct()
 
 void Menu::ViewAllProducts()
 {
-  std::cout << "Viewing all products..." << std::endl;
   productStack.displayAllProducts();
 }
 
-// Customer functionality (Add inquiry, View inquiry, Process inquiry)
 void Menu::AddNewInquiry()
 {
-  std::string message;
-  promptForInput("Enter inquiry message: ", message);
+  std::string inquiryMessage;
+  Utils::promptForInput("Enter your inquiry message: ", inquiryMessage);
 
-  InquiryNode inquiry("", currentUser.getEmail(), message);
-  db.saveInquiryToDB(inquiry, currentUser.getId());
-
-  std::cout << "Inquiry added successfully!\n";
+  InquiryNode inquiry(currentUser.getName(), currentUser.getEmail(), inquiryMessage);
+  inquiryManager.saveInquiryToDB(inquiry, currentUser.getId()); // Save inquiry
+  std::cout << "Inquiry added!" << std::endl;
 }
 
 void Menu::ProcessInquiry()
 {
-  InquiryNode *inquiry = db.loadNextInquiryFromDB();
+  InquiryNode *inquiry = inquiryManager.loadNextInquiryFromDB();
   if (inquiry != nullptr)
   {
-    std::cout << "Processing inquiry from: " << inquiry->inquiryMessage << std::endl;
+    std::cout << "Processing inquiry from: " << inquiry->customerName << std::endl;
     delete inquiry;
   }
   else
   {
-    std::cout << "No inquiries to process.\n";
+    std::cout << "No inquiries to process." << std::endl;
   }
 }
 
 void Menu::ViewInquiries()
 {
-  inquiryQueue.displayAllInquiries();
-}
-
-void Menu::clearConsole() const
-{
-  // std::cout << "\033[2J\033[H";
+  std::cout << "Viewing all inquiries:" << std::endl;
 }
 
 void Menu::ExitMenu()
