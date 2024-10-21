@@ -1,75 +1,61 @@
 #include "InquiryQueue.h"
 #include <iostream>
 
-// Constructor initializes front and rear to nullptr (empty queue)
-InquiryQueue::InquiryQueue() : front(nullptr), rear(nullptr) {}
-
-// Destructor deallocates all nodes
-InquiryQueue::~InquiryQueue()
-{
-  while (front != nullptr)
-  {
-    InquiryNode *temp = front;
-    front = front->next;
-    delete temp;
-  }
-}
+// Constructor initializes an empty queue
+InquiryQueue::InquiryQueue() {}
 
 // Enqueue a new inquiry
-void InquiryQueue::enqueue(const std::string &name, const std::string &email, const std::string &message)
+void InquiryQueue::enqueue(const Inquiry &inquiry)
 {
-  InquiryNode *newInquiry = new InquiryNode(name, email, message);
-
-  if (rear == nullptr)
-  {
-    front = rear = newInquiry; // First inquiry in an empty queue
-  }
-  else
-  {
-    rear->next = newInquiry; // Append the new inquiry to the rear
-    rear = newInquiry;
-  }
+  queue.push(inquiry);
 }
 
 // Dequeue the oldest inquiry (FIFO)
-InquiryNode *InquiryQueue::dequeue()
+Inquiry InquiryQueue::dequeue()
 {
   if (isEmpty())
   {
-    return nullptr;
+    throw std::runtime_error("No inquiries to dequeue.");
   }
+  Inquiry inquiry = queue.front(); // Get the front inquiry
+  queue.pop();                     // Remove it from the queue
+  return inquiry;                  // Return the dequeued inquiry
+}
 
-  InquiryNode *oldFront = front;
-  front = front->next;
-  if (front == nullptr)
+// Peek the front inquiry without dequeuing
+Inquiry InquiryQueue::peekFront() const
+{
+  if (isEmpty())
   {
-    rear = nullptr; // The queue is now empty
+    throw std::runtime_error("No inquiries available.");
   }
-
-  return oldFront; // Return the removed node
+  return queue.front();
 }
 
 // Display all pending inquiries
 void InquiryQueue::displayAllInquiries() const
 {
-  InquiryNode *current = front;
-  if (isEmpty())
+  std::queue<Inquiry> tempQueue = queue; // Copy the queue to iterate through
+
+  if (tempQueue.empty())
   {
     std::cout << "No inquiries available.\n";
     return;
   }
-  while (current != nullptr)
+
+  while (!tempQueue.empty())
   {
-    std::cout << "Customer Name: " << current->customerName << "\n";
-    std::cout << "Customer Email: " << current->customerEmail << "\n";
-    std::cout << "Inquiry Message: " << current->inquiryMessage << "\n";
+    Inquiry inquiry = tempQueue.front();
+    std::cout << "Customer Name: " << inquiry.getUser().getName() << "\n";
+    std::cout << "Customer Email: " << inquiry.getUser().getEmail() << "\n";
+    std::cout << "Inquiry Message: " << inquiry.getMessage() << "\n";
     std::cout << "-------------------------------\n";
-    current = current->next;
+    tempQueue.pop();
   }
 }
 
 // Check if the queue is empty
 bool InquiryQueue::isEmpty() const
 {
-  return front == nullptr;
+  return queue.empty();
 }

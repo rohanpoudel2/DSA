@@ -8,6 +8,7 @@
 #include "UserManager.h"
 #include "ProductManager.h"
 #include "InquiryManager.h"
+#include "InquiryQueue.h"
 #include "User.h"
 #include "ProductList.h"
 
@@ -21,9 +22,12 @@ private:
   UserManager userManager;       // Manages user operations
   ProductManager productManager; // Manages product operations
   InquiryManager inquiryManager; // Manages inquiry operations
+  InquiryQueue inquiryQueue;     // Queue of inquiries
 
   User currentUser;         // The currently logged-in user
   ProductList productStack; // Stack of products
+
+  std::string dbPath;
 
 public:
   // Constructor to initialize the menu with user-based options
@@ -50,6 +54,10 @@ public:
   void AddNewInquiry();
   void ProcessInquiry();
   void ViewInquiries();
+
+  std::string getDbPath() const { return dbPath; }
+
+  void setDbPath(const std::string &path) { dbPath = path; }
 
   // Function to exit the menu
   void ExitMenu();

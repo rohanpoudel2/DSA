@@ -1,4 +1,5 @@
 #include "UserManager.h"
+#include "Utils.h" // Include the Utils header
 #include <iostream>
 
 UserManager::UserManager(const std::string &filename) : Database(filename)
@@ -23,6 +24,31 @@ void UserManager::createTables()
   {
     std::cerr << "Error creating users table: " << errMsg << std::endl;
     sqlite3_free(errMsg);
+  }
+
+  // Check if admin user exists and create one if it doesn't
+  const char *checkAdminSQL = "SELECT COUNT(*) FROM users WHERE role='admin';";
+  sqlite3_stmt *stmt;
+  bool adminExists = false;
+
+  if (sqlite3_prepare_v2(db, checkAdminSQL, -1, &stmt, nullptr) == SQLITE_OK)
+  {
+    if (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+      adminExists = (sqlite3_column_int(stmt, 0) > 0);
+    }
+  }
+  sqlite3_finalize(stmt);
+
+  if (!adminExists)
+  {
+    std::string hashedPassword = Utils::hashPassword("root");
+    std::string insertAdminSQL = "INSERT INTO users (name, email, role, password) VALUES ('admin', 'admin@example.com', 'admin', '" + hashedPassword + "');";
+    if (sqlite3_exec(db, insertAdminSQL.c_str(), nullptr, nullptr, &errMsg) != SQLITE_OK)
+    {
+      std::cerr << "Error inserting admin user: " << errMsg << std::endl;
+      sqlite3_free(errMsg);
+    }
   }
 }
 

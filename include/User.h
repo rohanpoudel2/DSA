@@ -2,6 +2,7 @@
 #define USER_H
 
 #include <string>
+#include <sqlite3.h>
 
 class User
 {
@@ -33,6 +34,8 @@ public:
 
   // Check if user is admin
   bool isAdmin() const;
+
+  static User getUserById(int userId, sqlite3 *db);
 };
 
 #endif // USER_H

@@ -1,0 +1,6 @@
+{
+  "db_path": {
+    "development": "./data/store.db",
+    "test": "./data/store_test.db"
+  }
+}

@@ -2,6 +2,7 @@
 #define INQUIRY_MANAGER_H
 
 #include "Database.h"
+#include "User.h"
 #include "InquiryQueue.h"
 
 class InquiryManager : public Database
@@ -11,9 +12,11 @@ public:
   void createTables() override;
 
   // Inquiry-specific operations
-  void saveInquiryToDB(const InquiryNode &inquiry, int user_id);
-  InquiryNode *loadNextInquiryFromDB();
-  void removeInquiryFromDB(int inquiry_id);
+  void saveInquiryToDB(const Inquiry &inquiry);
+  InquiryQueue loadInquiriesForUser(int userId);
+  InquiryQueue loadAllInquiriesWithNoResponses();
+  void removeInquiryFromDB(int inquiryId);
+  void saveInquiryResponseToDB(const Inquiry &inquiry);
 };
 
 #endif

@@ -1,26 +1,30 @@
 #include "Menu.h"
 #include "Utils.h"
 
+std::string environment = "development";
+
+std::string dbPath = Utils::getDatabasePath(environment);
+
 Menu::Menu()
     : userManager("./data/store.db"),
       productManager("./data/store.db"),
       inquiryManager("./data/store.db"),
-      currentUser() // Initialize currentUser
+      inquiryQueue() // Initialize inquiryQueue
 {
+  std::cout << dbPath << std::endl;
   Login(); // Prompt user to log in
-
   if (currentUser.isAdmin())
   {
     menu_options = {{{1, "Add new product", std::bind(&Menu::AddNewProduct, this)},
                      {2, "View all products", std::bind(&Menu::ViewAllProducts, this)},
                      {3, "Undo last added product", std::bind(&Menu::UndoLastAddedProduct, this)},
-                     {4, "Exit", std::bind(&Menu::ExitMenu, this)}}};
+                     {4, "Process inquiry", std::bind(&Menu::ProcessInquiry, this)},
+                     {5, "Exit", std::bind(&Menu::ExitMenu, this)}}};
   }
   else
   {
     menu_options = {{{1, "Add new inquiry", std::bind(&Menu::AddNewInquiry, this)},
                      {2, "View inquiries", std::bind(&Menu::ViewInquiries, this)},
-                     {3, "Process inquiry", std::bind(&Menu::ProcessInquiry, this)},
                      {4, "Exit", std::bind(&Menu::ExitMenu, this)}}};
   }
 
@@ -154,28 +158,69 @@ void Menu::AddNewInquiry()
   std::string inquiryMessage;
   Utils::promptForInput("Enter your inquiry message: ", inquiryMessage);
 
-  InquiryNode inquiry(currentUser.getName(), currentUser.getEmail(), inquiryMessage);
-  inquiryManager.saveInquiryToDB(inquiry, currentUser.getId()); // Save inquiry
+  Inquiry inquiry(currentUser, inquiryMessage, Utils::getCurrentTimestamp()); // Create Inquiry object
+  inquiryManager.saveInquiryToDB(inquiry);                                    // Save inquiry
+
   std::cout << "Inquiry added!" << std::endl;
 }
 
 void Menu::ProcessInquiry()
 {
-  InquiryNode *inquiry = inquiryManager.loadNextInquiryFromDB();
-  if (inquiry != nullptr)
+  bool continueProcessing = true;
+
+  InquiryQueue inquiryQueue = inquiryManager.loadAllInquiriesWithNoResponses();
+
+  while (continueProcessing)
   {
-    std::cout << "Processing inquiry from: " << inquiry->customerName << std::endl;
-    delete inquiry;
-  }
-  else
-  {
-    std::cout << "No inquiries to process." << std::endl;
+    if (inquiryQueue.isEmpty())
+    {
+      std::cout << "No more inquiries to process.\n";
+      return;
+    }
+
+    Inquiry inquiry = inquiryQueue.peekFront();
+
+    // Display the inquiry details
+    std::cout << "Inquiry from: " << inquiry.getUser().getName() << " ("
+              << inquiry.getUser().getEmail() << ")\n";
+    std::cout << "Message: " << inquiry.getMessage() << "\n";
+    std::cout << "Timestamp: " << inquiry.getTimestamp() << "\n";
+
+    // Prompt the admin to enter a response
+    std::string response;
+    Utils::promptForInput("Enter your response: ", response);
+
+    // Set the response and save to the database
+    inquiry.setResponse(response);
+    inquiryManager.saveInquiryResponseToDB(inquiry); // Implement this in InquiryManager
+
+    std::cout << "Response saved.\n";
+
+    // Remove the inquiry from the queue
+    inquiryQueue.dequeue();
+
+    // Ask the admin whether to continue processing more inquiries
+    char choice;
+    std::cout << "Do you want to process the next inquiry? (y/n): ";
+    std::cin >> choice;
+
+    if (choice != 'y' && choice != 'Y')
+    {
+      continueProcessing = false;
+    }
   }
 }
 
 void Menu::ViewInquiries()
 {
-  std::cout << "Viewing all inquiries:" << std::endl;
+  inquiryQueue = inquiryManager.loadInquiriesForUser(currentUser.getId()); // Load inquiries for the current user
+  if (inquiryQueue.isEmpty())
+  {
+    std::cout << "No inquiries found for your account." << std::endl;
+    return;
+  }
+
+  inquiryQueue.displayAllInquiries(); // Display all inquiries for the current user
 }
 
 void Menu::ExitMenu()

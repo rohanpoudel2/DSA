@@ -22,6 +22,8 @@ add_executable(EcommerceStore
   src/Database.cpp
   src/ProductManager.cpp
   src/InquiryManager.cpp
+  src/InquiryQueue.cpp
+  src/Inquiry.cpp
   src/UserManager.cpp
   src/Menu.cpp
   src/Utils.cpp

@@ -1,32 +1,30 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include <iostream>
-#include <limits>
 #include <string>
-#include <functional>
+#include <iostream>
 
 class Utils
 {
 public:
-  // Hash a password using std::hash (replace this with more secure hash if needed)
+  static bool handleInputFailure(std::istream &input);
   static std::string hashPassword(const std::string &password);
 
-  // Handles input failures by clearing the error state and ignoring invalid input
-  static bool handleInputFailure(std::istream &stream);
-
-  // Template function for input validation
+  // Function declarations for promptForInput (template)
   template <typename T>
-  static void promptForInput(const std::string &prompt_message, T &input)
-  {
-    while (true)
-    {
-      std::cout << prompt_message;
-      std::cin >> input;
-      if (!handleInputFailure(std::cin))
-        break;
-    }
-  }
+  static void promptForInput(const std::string &message, T &value);
+
+  static std::string getCurrentTimestamp();
+  static std::string getDatabasePath(std::string &environment);
 };
 
-#endif
+// Template declaration (but not specialized here in the header)
+template <typename T>
+void Utils::promptForInput(const std::string &message, T &value)
+{
+  std::cout << message;
+  std::cin >> value;
+  handleInputFailure(std::cin);
+}
+
+#endif // UTILS_H
