@@ -4,10 +4,10 @@
 
 UserManager::UserManager(const std::string &filename) : Database(filename)
 {
-  createTables();
+  createTable();
 }
 
-void UserManager::createTables()
+void UserManager::createTable()
 {
   const char *createUserTableSQL = R"(
       CREATE TABLE IF NOT EXISTS users (

@@ -9,7 +9,7 @@ class InquiryManager : public Database
 {
 public:
   InquiryManager(const std::string &filename);
-  void createTables() override;
+  void createTable();
 
   void saveInquiryToDB(const Inquiry &inquiry);
   InquiryQueue loadInquiriesForUser(int userId);

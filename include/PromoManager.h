@@ -1,20 +1,17 @@
 #ifndef PROMO_MANAGER_H
 #define PROMO_MANAGER_H
 
+#include "Database.h"
 #include "Promo.h"
-#include <sqlite3.h>
 #include <list>
 
-class PromoManager
+class PromoManager : public Database
 {
-private:
-  sqlite3 *db;
-
 public:
   PromoManager(const std::string &dbPath);
   ~PromoManager();
 
-  void createPromoTable();
+  void createTable();
 
   void addPromo(const Promo &promo);
 

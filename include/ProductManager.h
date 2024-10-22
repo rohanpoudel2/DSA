@@ -8,9 +8,8 @@ class ProductManager : public Database
 {
 public:
   ProductManager(const std::string &filename);
-  void createTables() override;
+  void createTable();
 
-  // Product-specific operations
   void saveProducts(const ProductList &productList, const std::string &mode = "append");
   void loadProducts(ProductList &productList);
 };

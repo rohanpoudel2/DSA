@@ -4,16 +4,12 @@
 #include <ctime>
 #include <cstdlib>
 
-PromoManager::PromoManager(const std::string &dbPath)
+PromoManager::PromoManager(const std::string &filename) : Database(filename)
 {
-  if (sqlite3_open(dbPath.c_str(), &db))
-  {
-    std::cerr << "Can't open database: " << sqlite3_errmsg(db) << std::endl;
-  }
-  createPromoTable();
+  createTable();
 }
 
-void PromoManager::createPromoTable()
+void PromoManager::createTable()
 {
   const char *createTableSQL = R"(
         CREATE TABLE IF NOT EXISTS promos (
@@ -35,10 +31,7 @@ void PromoManager::createPromoTable()
 
 PromoManager::~PromoManager()
 {
-  if (db)
-  {
-    sqlite3_close(db);
-  }
+  // The db pointer is handled by the Database class, so no need to close here.
 }
 
 void PromoManager::addPromo(const Promo &promo)

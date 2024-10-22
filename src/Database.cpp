@@ -2,6 +2,7 @@
 #include "UserManager.h"
 #include "ProductManager.h"
 #include "InquiryManager.h"
+#include "PromoManager.h"
 #include <sqlite3.h>
 #include <iostream>
 
@@ -33,11 +34,14 @@ sqlite3 *Database::connectToDB(const std::string &dbPath)
 void Database::createTables()
 {
   UserManager userDB(sourceFile);
-  userDB.createTables();
+  userDB.createTable();
 
   ProductManager productDB(sourceFile);
-  productDB.createTables();
+  productDB.createTable();
 
   InquiryManager inquiryDB(sourceFile);
-  inquiryDB.createTables();
+  inquiryDB.createTable();
+
+  PromoManager promoDB(sourceFile);
+  promoDB.createTable();
 }

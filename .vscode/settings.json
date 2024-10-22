@@ -83,7 +83,8 @@
     "type_traits": "cpp",
     "utility": "cpp",
     "chrono": "cpp",
-    "regex": "cpp"
+    "regex": "cpp",
+    "future": "cpp"
   },
   "C_Cpp.default.cppStandard": "c++17",
   "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",

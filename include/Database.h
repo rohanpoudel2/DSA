@@ -16,7 +16,7 @@ public:
 
   sqlite3 *connectToDB(const std::string &dbPath);
 
-  virtual void createTables() = 0;
+  void createTables();
 
   sqlite3 *getDB() const { return db; }
 };

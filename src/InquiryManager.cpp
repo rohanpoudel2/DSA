@@ -4,10 +4,10 @@
 
 InquiryManager::InquiryManager(const std::string &filename) : Database(filename)
 {
-  createTables();
+  createTable();
 }
 
-void InquiryManager::createTables()
+void InquiryManager::createTable()
 {
   const char *createInquiryTableSQL = R"(
     CREATE TABLE IF NOT EXISTS inquiries (

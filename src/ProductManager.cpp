@@ -3,14 +3,10 @@
 
 ProductManager::ProductManager(const std::string &filename) : Database(filename)
 {
-  db = connectToDB(sourceFile);
-  if (db != nullptr)
-  {
-    createTables();
-  }
+  createTable();
 }
 
-void ProductManager::createTables()
+void ProductManager::createTable()
 {
   const char *createProductTableSQL = R"(
       CREATE TABLE IF NOT EXISTS products (

@@ -3,16 +3,13 @@
 
 std::string environment = "development";
 
-std::string dbPath = Utils::getDatabasePath(environment);
-
 Menu::Menu()
-    : userManager("./data/store.db"),
-      productManager("./data/store.db"),
-      inquiryManager("./data/store.db"),
-      promoManager("./data/store.db"),
+    : userManager(Utils::getDatabasePath(environment)),
+      productManager(Utils::getDatabasePath(environment)),
+      inquiryManager(Utils::getDatabasePath(environment)),
+      promoManager(Utils::getDatabasePath(environment)),
       inquiryQueue()
 {
-  std::cout << dbPath << std::endl;
   Login();
   if (currentUser.isAdmin())
   {

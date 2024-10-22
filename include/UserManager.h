@@ -8,9 +8,8 @@ class UserManager : public Database
 {
 public:
   UserManager(const std::string &filename);
-  void createTables() override;
+  void createTable();
 
-  // User-specific operations
   void addUser(const User &user, sqlite3 *db);
   User getCustomerByEmail(const std::string &email, sqlite3 *db);
   bool verifyAdminPassword(const std::string &hashedPassword, sqlite3 *db);
