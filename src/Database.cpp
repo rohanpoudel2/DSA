@@ -1,80 +1,43 @@
 #include "Database.h"
-#include <fstream>
+#include "UserManager.h"
+#include "ProductManager.h"
+#include "InquiryManager.h"
+#include <sqlite3.h>
 #include <iostream>
-#include <filesystem>
-#include <sstream>
 
-// Constructor initializes the database with the given file path
-Database::Database(const std::string &filename) : sourceFile(filename) {}
-
-// Save only the top product to the file (stack-like behavior)
-void Database::saveProducts(const ProductList &productList, const std::string &mode)
+Database::Database(const std::string &filename) : sourceFile(filename)
 {
-  std::ofstream outFile(sourceFile, mode == "replace" ? std::ios::trunc : std::ios::app);
-  if (!outFile)
-  {
-    std::cerr << "Unable to open file: " << sourceFile << std::endl;
-    return;
-  }
-
-  // If appending, only save the top product
-  if (mode == "append" && productList.getHead() != nullptr)
-  {
-    ProductList::Node *topProduct = productList.getHead();
-    outFile << topProduct->product.getName() << ","
-            << topProduct->product.getPrice() << ","
-            << topProduct->product.getQuantity() << std::endl;
-  }
-
-  // If replacing, save all products in the stack
-  else if (mode == "replace")
-  {
-    ProductList::Node *temp = productList.getHead();
-    while (temp != nullptr)
-    {
-      outFile << temp->product.getName() << ","
-              << temp->product.getPrice() << ","
-              << temp->product.getQuantity() << std::endl;
-      temp = temp->next;
-    }
-  }
-
-  outFile.close();
+  db = connectToDB(sourceFile);
 }
 
-// Load all products from the file and push them onto the stack (one by one)
-void Database::loadProducts(ProductList &productList)
+Database::~Database()
 {
-  if (!std::filesystem::exists(sourceFile))
+  if (db)
   {
-    std::cerr << "File not found: " << sourceFile << std::endl;
-    return;
+    sqlite3_close(db);
   }
+}
 
-  std::ifstream inFile(sourceFile);
-  if (!inFile)
+// Connect to SQLite Database
+sqlite3 *Database::connectToDB(const std::string &dbPath)
+{
+  sqlite3 *db;
+  if (sqlite3_open(dbPath.c_str(), &db))
   {
-    std::cerr << "Unable to open file: " << sourceFile << std::endl;
-    return;
+    std::cerr << "Can't open database: " << sqlite3_errmsg(db) << std::endl;
+    return nullptr;
   }
+  return db;
+}
 
-  std::string line;
-  while (std::getline(inFile, line))
-  {
-    std::stringstream ss(line); // Parse the line
-    std::string name;
-    double price;
-    int quantity;
-    char delimiter;
+void Database::createTables()
+{
+  UserManager userDB(sourceFile);
+  userDB.createTables();
 
-    // Parse the product data
-    std::getline(ss, name, ',');
-    ss >> price >> delimiter >> quantity;
+  ProductManager productDB(sourceFile);
+  productDB.createTables();
 
-    // Add the parsed product to the stack
-    Product newProduct(name, price, quantity);
-    productList.pushProduct(newProduct); // Push to the stack
-  }
-
-  inFile.close();
+  InquiryManager inquiryDB(sourceFile);
+  inquiryDB.createTables();
 }

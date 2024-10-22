@@ -51,6 +51,8 @@ public:
   // Precondition: None
   // Postcondition: Returns true if the list is empty, false otherwise
   bool isEmpty() const;
+
+  void clear();
 };
 
 #endif

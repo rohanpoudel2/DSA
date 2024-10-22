@@ -62,6 +62,17 @@ void ProductList::displayAllProducts() const
   }
 }
 
+void ProductList::clear()
+{
+  while (head != nullptr)
+  {
+    Node *temp = head;
+    head = head->next;
+    delete temp;
+  }
+  head = nullptr;
+}
+
 bool ProductList::isEmpty() const
 {
   return head == nullptr;

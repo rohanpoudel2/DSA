@@ -1,133 +1,44 @@
 #include "Menu.h"
-#include "ProductList.h"
-#include "Database.h"
+#include "Utils.h"
 
-#include <string>
-#include <limits>
+std::string environment = "development";
 
-// Handles input failures by clearing the error state and ignoring invalid input
-// Precondition: stream contains input that may be invalid
-// Postcondition: Error state is cleared if input was invalid, input buffer is always cleared
-// Written by Rohan Poudel
-bool handleInputFailure(std::istream &stream)
-{
-  using namespace std;
-  if (stream.fail())
-  {
-    stream.clear();                                         // Clear the error flag
-    stream.ignore(numeric_limits<streamsize>::max(), '\n'); // Ignore invalid input
-    cout << "Invalid input. Please enter the correct type." << endl;
-    return true;
-  }
-  else
-  {
-    stream.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear the input buffer
-    return false;
-  }
-}
+std::string dbPath = Utils::getDatabasePath(environment);
 
-// Function template for input validation
-// Precondition: prompt_message is a valid string, input is a valid reference to a variable of type T
-// Postcondition: Retrieves input from the user, ensuring valid input of the correct type
-// Written by Rohan Poudel
-template <typename T>
-void promptForInput(const std::string &prompt_message, T &input)
-{
-  using namespace std;
-
-  while (true)
-  {
-    cout << prompt_message;
-    cin >> input;
-
-    // Check if the input failed and handle it appropriately
-    if (!handleInputFailure(cin))
-      break;
-  }
-}
-
-ProductList productStack;
-
-// Written by Rohan Poudel
-void Menu::AddNewProduct()
-{
-  std::string product_name;
-  double product_price;
-  int product_quantity;
-
-  promptForInput("Enter product name: ", product_name);
-  promptForInput("Enter product price: ", product_price);
-  promptForInput("Enter product quantity: ", product_quantity);
-
-  Product newProduct(product_name, product_price, product_quantity); // Create a new product object
-
-  Database db("./data/products.txt"); // Initialize the database to save the product
-
-  productStack.pushProduct(newProduct);    // Add the product to the list
-  db.saveProducts(productStack, "append"); // Save the updated list to the database
-
-  std::cout << "Adding a new product..." << std::endl;
-  newProduct.displayProduct();
-}
-
-// Written by Rohan Poudel
-void Menu::UndoLastAddedProduct()
-{
-  using namespace std;
-  if (!productStack.isEmpty())
-  {
-    Product removedProduct = productStack.popProduct();
-    cout << "Undoing the last added product:" << removedProduct.getName() << endl;
-
-    Database db("./data/products.txt");
-    db.saveProducts(productStack, "replace");
-  }
-  else
-  {
-    cout << "No products to undo!" << endl;
-  }
-}
-
-// Written by Rohan Poudel
-void Menu::ViewAllProducts()
-{
-  std::cout << "Viewing all products..." << std::endl;
-  productStack.displayAllProducts();
-}
-
-// Written by Rohan Poudel
-void Menu::FindProduct()
-{
-  std::cout << "Feature coming soon..." << std::endl;
-}
-
-// Written by Rohan Poudel
-void Menu::ExitMenu()
-{
-  std::cout << "Exiting..." << std::endl;
-  exit(0);
-}
-
-// Written by Rohan Poudel
 Menu::Menu()
+    : userManager("./data/store.db"),
+      productManager("./data/store.db"),
+      inquiryManager("./data/store.db"),
+      promoManager("./data/store.db"),
+      inquiryQueue()
 {
-  menu_options = {{{1, "Add new product", AddNewProduct},
-                   {2, "View all products", ViewAllProducts},
-                   {3, "Find a product", FindProduct},
-                   {4, "Undo last added product", UndoLastAddedProduct},
-                   {5, "Exit", ExitMenu}}};
+  std::cout << dbPath << std::endl;
+  Login();
+  if (currentUser.isAdmin())
+  {
+    menu_options = {{{1, "Add new product", std::bind(&Menu::AddNewProduct, this)},
+                     {2, "View all products", std::bind(&Menu::ViewAllProducts, this)},
+                     {3, "Undo last added product", std::bind(&Menu::UndoLastAddedProduct, this)},
+                     {4, "Process inquiry", std::bind(&Menu::ProcessInquiry, this)},
+                     {5, "Exit", std::bind(&Menu::ExitMenu, this)}}};
+  }
+  else
+  {
+    menu_options = {{{1, "Add new inquiry", std::bind(&Menu::AddNewInquiry, this)},
+                     {2, "View inquiries", std::bind(&Menu::ViewInquiries, this)},
+                     {3, "Spin Wheel for Promo", std::bind(&Menu::SpinWheel, this)},
+                     {4, "Exit", std::bind(&Menu::ExitMenu, this)}}};
+  }
 
-  Database db("./data/products.txt");
-  db.loadProducts(productStack);
+  productManager.loadProducts(productStack);
 }
 
-// Written by Rohan Poudel
 void Menu::displayMenu() const
 {
   std::cout << "===============================" << std::endl;
   std::cout << "       E-commerce Store" << std::endl;
   std::cout << "===============================" << std::endl;
-  for (const auto &option : menu_options) // Loop through the array of options and display each
+  for (const auto &option : menu_options)
   {
     std::cout << std::get<0>(option) << ". " << std::get<1>(option) << std::endl;
   }
@@ -135,37 +46,196 @@ void Menu::displayMenu() const
   std::cout << "Enter your choice: ";
 }
 
-// Written by Rohan Poudel
 void Menu::processOption() const
 {
-  using namespace std;
-
   int choice;
-  cin >> choice;
+  std::cin >> choice;
 
-  // Validate the input
-  if (handleInputFailure(cin))
+  if (Utils::handleInputFailure(std::cin))
     return;
 
-  // Match the choice with the menu options
   for (const auto &option : menu_options)
   {
-    if (get<0>(option) == choice)
+    if (std::get<0>(option) == choice)
     {
-      get<2>(option)(); // Execute the corresponding function
+      std::get<2>(option)();
       return;
     }
   }
 
-  cout << "Invalid option!" << endl;
+  std::cout << "Invalid option!" << std::endl;
 }
 
-// Written by Rohan Poudel
-void Menu::startMenu() const
+void Menu::startMenu()
 {
   while (true)
   {
     displayMenu();
     processOption();
   }
+}
+
+void Menu::Login()
+{
+  std::string email, password;
+  std::cout << "Welcome! Are you logging in as (1) Admin or (2) Customer? ";
+  int roleOption;
+  std::cin >> roleOption;
+
+  if (roleOption == 1)
+  {
+    Utils::promptForInput("Enter admin password: ", password);
+    if (userManager.verifyAdminPassword(Utils::hashPassword(password), userManager.getDB()))
+    {
+      currentUser = User("Admin", "admin@store.com", "admin", password);
+      std::cout << "Admin access granted!" << std::endl;
+    }
+    else
+    {
+      std::cerr << "Invalid admin credentials!" << std::endl;
+      exit(1);
+    }
+  }
+  else
+  {
+    Utils::promptForInput("Enter your email: ", email);
+    currentUser = userManager.getCustomerByEmail(email, userManager.getDB());
+
+    if (currentUser.getEmail().empty())
+    {
+      std::string name;
+      Utils::promptForInput("Enter your name: ", name);
+      std::string plainPassword;
+      Utils::promptForInput("Enter your password: ", plainPassword);
+
+      currentUser = User(name, email, "customer", Utils::hashPassword(plainPassword));
+      userManager.addUser(currentUser, userManager.getDB());
+      std::cout << "Customer registered!" << std::endl;
+
+      std::cout << "As a new customer, you get a chance to spin the wheel for a discount!" << std::endl;
+      SpinWheel();
+    }
+    else
+    {
+      std::cout << "Welcome back, " << currentUser.getName() << "!" << std::endl;
+    }
+  }
+}
+
+void Menu::AddNewProduct()
+{
+  std::string product_name;
+  double product_price;
+  int product_quantity;
+
+  Utils::promptForInput("Enter product name: ", product_name);
+  Utils::promptForInput("Enter product price: ", product_price);
+  Utils::promptForInput("Enter product quantity: ", product_quantity);
+
+  Product newProduct(product_name, product_price, product_quantity);
+  productStack.pushProduct(newProduct);
+  productManager.saveProducts(productStack, "replace");
+
+  std::cout << "Added new product: " << product_name << std::endl;
+}
+
+void Menu::SpinWheel()
+{
+  int discount = promoManager.spinWheel();
+  std::cout << "Congratulations! You won a " << discount << "% discount on your next order!" << std::endl;
+
+  Promo promo(0, currentUser.getId(), discount, Utils::getCurrentTimestamp());
+  promoManager.addPromo(promo);
+
+  std::cout << "Your discount has been saved for future use!" << std::endl;
+}
+
+void Menu::UndoLastAddedProduct()
+{
+  if (!productStack.isEmpty())
+  {
+    Product removedProduct = productStack.popProduct();
+    std::cout << "Undoing the last added product: " << removedProduct.getName() << std::endl;
+    productManager.saveProducts(productStack, "replace");
+  }
+  else
+  {
+    std::cout << "No products to undo!" << std::endl;
+  }
+}
+
+void Menu::ViewAllProducts()
+{
+  productStack.displayAllProducts();
+}
+
+void Menu::AddNewInquiry()
+{
+  std::string inquiryMessage;
+  Utils::promptForInput("Enter your inquiry message: ", inquiryMessage);
+
+  Inquiry inquiry(currentUser, inquiryMessage, Utils::getCurrentTimestamp());
+  inquiryManager.saveInquiryToDB(inquiry);
+
+  std::cout << "Inquiry added!" << std::endl;
+}
+
+void Menu::ProcessInquiry()
+{
+  bool continueProcessing = true;
+
+  InquiryQueue inquiryQueue = inquiryManager.loadAllInquiriesWithNoResponses();
+
+  while (continueProcessing)
+  {
+    if (inquiryQueue.isEmpty())
+    {
+      std::cout << "No more inquiries to process.\n";
+      return;
+    }
+
+    Inquiry inquiry = inquiryQueue.peekFront();
+
+    std::cout << "Inquiry from: " << inquiry.getUser().getName() << " ("
+              << inquiry.getUser().getEmail() << ")\n";
+    std::cout << "Message: " << inquiry.getMessage() << "\n";
+    std::cout << "Timestamp: " << inquiry.getTimestamp() << "\n";
+
+    std::string response;
+    Utils::promptForInput("Enter your response: ", response);
+
+    inquiry.setResponse(response);
+    inquiryManager.saveInquiryResponseToDB(inquiry);
+
+    std::cout << "Response saved.\n";
+
+    inquiryQueue.dequeue();
+
+    char choice;
+    std::cout << "Do you want to process the next inquiry? (y/n): ";
+    std::cin >> choice;
+
+    if (choice != 'y' && choice != 'Y')
+    {
+      continueProcessing = false;
+    }
+  }
+}
+
+void Menu::ViewInquiries()
+{
+  inquiryQueue = inquiryManager.loadInquiriesForUser(currentUser.getId());
+  if (inquiryQueue.isEmpty())
+  {
+    std::cout << "No inquiries found for your account." << std::endl;
+    return;
+  }
+
+  inquiryQueue.displayAllInquiries();
+}
+
+void Menu::ExitMenu()
+{
+  std::cout << "Exiting..." << std::endl;
+  exit(0);
 }
