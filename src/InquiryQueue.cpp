@@ -1,28 +1,24 @@
 #include "InquiryQueue.h"
 #include <iostream>
 
-// Constructor initializes an empty queue
 InquiryQueue::InquiryQueue() {}
 
-// Enqueue a new inquiry
 void InquiryQueue::enqueue(const Inquiry &inquiry)
 {
   queue.push(inquiry);
 }
 
-// Dequeue the oldest inquiry (FIFO)
 Inquiry InquiryQueue::dequeue()
 {
   if (isEmpty())
   {
     throw std::runtime_error("No inquiries to dequeue.");
   }
-  Inquiry inquiry = queue.front(); // Get the front inquiry
-  queue.pop();                     // Remove it from the queue
-  return inquiry;                  // Return the dequeued inquiry
+  Inquiry inquiry = queue.front();
+  queue.pop();
+  return inquiry;
 }
 
-// Peek the front inquiry without dequeuing
 Inquiry InquiryQueue::peekFront() const
 {
   if (isEmpty())
@@ -32,10 +28,9 @@ Inquiry InquiryQueue::peekFront() const
   return queue.front();
 }
 
-// Display all pending inquiries
 void InquiryQueue::displayAllInquiries() const
 {
-  std::queue<Inquiry> tempQueue = queue; // Copy the queue to iterate through
+  std::queue<Inquiry> tempQueue = queue;
 
   if (tempQueue.empty())
   {
@@ -54,7 +49,6 @@ void InquiryQueue::displayAllInquiries() const
   }
 }
 
-// Check if the queue is empty
 bool InquiryQueue::isEmpty() const
 {
   return queue.empty();

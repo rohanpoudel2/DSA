@@ -1,10 +1,10 @@
 #include "UserManager.h"
-#include "Utils.h" // Include the Utils header
+#include "Utils.h"
 #include <iostream>
 
 UserManager::UserManager(const std::string &filename) : Database(filename)
 {
-  createTables(); // Explicitly create the tables after constructing the base
+  createTables();
 }
 
 void UserManager::createTables()
@@ -26,7 +26,6 @@ void UserManager::createTables()
     sqlite3_free(errMsg);
   }
 
-  // Check if admin user exists and create one if it doesn't
   const char *checkAdminSQL = "SELECT COUNT(*) FROM users WHERE role='admin';";
   sqlite3_stmt *stmt;
   bool adminExists = false;
@@ -52,7 +51,6 @@ void UserManager::createTables()
   }
 }
 
-// Verify Admin Password
 bool UserManager::verifyAdminPassword(const std::string &hashedPassword, sqlite3 *db)
 {
   sqlite3_stmt *stmt;
@@ -71,7 +69,6 @@ bool UserManager::verifyAdminPassword(const std::string &hashedPassword, sqlite3
   return verified;
 }
 
-// Add User
 void UserManager::addUser(const User &user, sqlite3 *db)
 {
   const char *sql = "INSERT INTO users (name, email, role, password) VALUES (?,?,?,?);";
@@ -92,7 +89,6 @@ void UserManager::addUser(const User &user, sqlite3 *db)
   sqlite3_finalize(stmt);
 }
 
-// Get Customer by Email
 User UserManager::getCustomerByEmail(const std::string &email, sqlite3 *db)
 {
   const char *sql = "SELECT id, name, email, role, password FROM users WHERE email=?;";

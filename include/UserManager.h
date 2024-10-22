@@ -7,7 +7,7 @@
 class UserManager : public Database
 {
 public:
-  UserManager(const std::string &filename); // Add constructor with filename
+  UserManager(const std::string &filename);
   void createTables() override;
 
   // User-specific operations

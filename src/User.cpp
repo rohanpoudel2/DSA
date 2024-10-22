@@ -1,9 +1,7 @@
 #include "User.h"
 
-// Default constructor
 User::User() : id(0), name(""), email(""), role("customer"), password("") {}
 
-// Parameterized constructor
 User::User(const std::string &name, const std::string &email, const std::string &role, const std::string &password)
     : name(name), email(email), role(role), password(password) {}
 

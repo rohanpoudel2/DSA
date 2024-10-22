@@ -25,6 +25,9 @@ add_executable(EcommerceStore
   src/InquiryQueue.cpp
   src/Inquiry.cpp
   src/UserManager.cpp
+  src/PromoManager.cpp
+  src/CircularLinkedList.cpp
+  src/Promo.cpp
   src/Menu.cpp
   src/Utils.cpp
 )

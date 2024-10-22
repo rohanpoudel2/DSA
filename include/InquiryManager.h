@@ -11,7 +11,6 @@ public:
   InquiryManager(const std::string &filename);
   void createTables() override;
 
-  // Inquiry-specific operations
   void saveInquiryToDB(const Inquiry &inquiry);
   InquiryQueue loadInquiriesForUser(int userId);
   InquiryQueue loadAllInquiriesWithNoResponses();

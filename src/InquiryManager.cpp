@@ -7,7 +7,6 @@ InquiryManager::InquiryManager(const std::string &filename) : Database(filename)
   createTables();
 }
 
-// Create inquiry table
 void InquiryManager::createTables()
 {
   const char *createInquiryTableSQL = R"(
@@ -47,7 +46,6 @@ void InquiryManager::saveInquiryResponseToDB(const Inquiry &inquiry)
   sqlite3_finalize(stmt);
 }
 
-// Save an inquiry to the database
 void InquiryManager::saveInquiryToDB(const Inquiry &inquiry)
 {
   const char *sql = "INSERT INTO inquiries (user_id, message, timestamp) VALUES (?, ?, ?);";
@@ -71,7 +69,6 @@ void InquiryManager::saveInquiryToDB(const Inquiry &inquiry)
   }
 }
 
-// Load inquiries for a specific user
 InquiryQueue InquiryManager::loadInquiriesForUser(int userId)
 {
   InquiryQueue inquiryQueue;
@@ -102,7 +99,6 @@ InquiryQueue InquiryManager::loadInquiriesForUser(int userId)
   return inquiryQueue;
 }
 
-// Remove inquiry after processing
 void InquiryManager::removeInquiryFromDB(int inquiryId)
 {
   const char *sql = "DELETE FROM inquiries WHERE inquiry_id = ?;";
@@ -117,7 +113,6 @@ void InquiryManager::removeInquiryFromDB(int inquiryId)
   sqlite3_finalize(stmt);
 }
 
-// Load all inquiries with no responses
 InquiryQueue InquiryManager::loadAllInquiriesWithNoResponses()
 {
   InquiryQueue inquiryQueue;

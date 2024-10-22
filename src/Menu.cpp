@@ -9,10 +9,11 @@ Menu::Menu()
     : userManager("./data/store.db"),
       productManager("./data/store.db"),
       inquiryManager("./data/store.db"),
-      inquiryQueue() // Initialize inquiryQueue
+      promoManager("./data/store.db"),
+      inquiryQueue()
 {
   std::cout << dbPath << std::endl;
-  Login(); // Prompt user to log in
+  Login();
   if (currentUser.isAdmin())
   {
     menu_options = {{{1, "Add new product", std::bind(&Menu::AddNewProduct, this)},
@@ -25,10 +26,11 @@ Menu::Menu()
   {
     menu_options = {{{1, "Add new inquiry", std::bind(&Menu::AddNewInquiry, this)},
                      {2, "View inquiries", std::bind(&Menu::ViewInquiries, this)},
+                     {3, "Spin Wheel for Promo", std::bind(&Menu::SpinWheel, this)},
                      {4, "Exit", std::bind(&Menu::ExitMenu, this)}}};
   }
 
-  productManager.loadProducts(productStack); // Load any products from the database
+  productManager.loadProducts(productStack);
 }
 
 void Menu::displayMenu() const
@@ -80,12 +82,12 @@ void Menu::Login()
   int roleOption;
   std::cin >> roleOption;
 
-  if (roleOption == 1) // Admin login
+  if (roleOption == 1)
   {
     Utils::promptForInput("Enter admin password: ", password);
-    if (userManager.verifyAdminPassword(Utils::hashPassword(password), userManager.getDB())) // Admin password check with getDB()
+    if (userManager.verifyAdminPassword(Utils::hashPassword(password), userManager.getDB()))
     {
-      currentUser = User("Admin", "rohan@poudel.com", "admin", password);
+      currentUser = User("Admin", "admin@store.com", "admin", password);
       std::cout << "Admin access granted!" << std::endl;
     }
     else
@@ -94,12 +96,12 @@ void Menu::Login()
       exit(1);
     }
   }
-  else // Customer login
+  else
   {
     Utils::promptForInput("Enter your email: ", email);
-    currentUser = userManager.getCustomerByEmail(email, userManager.getDB()); // Customer lookup with getDB()
+    currentUser = userManager.getCustomerByEmail(email, userManager.getDB());
 
-    if (currentUser.getEmail().empty()) // New customer registration
+    if (currentUser.getEmail().empty())
     {
       std::string name;
       Utils::promptForInput("Enter your name: ", name);
@@ -107,8 +109,11 @@ void Menu::Login()
       Utils::promptForInput("Enter your password: ", plainPassword);
 
       currentUser = User(name, email, "customer", Utils::hashPassword(plainPassword));
-      userManager.addUser(currentUser, userManager.getDB()); // Register new customer with getDB()
+      userManager.addUser(currentUser, userManager.getDB());
       std::cout << "Customer registered!" << std::endl;
+
+      std::cout << "As a new customer, you get a chance to spin the wheel for a discount!" << std::endl;
+      SpinWheel();
     }
     else
     {
@@ -128,10 +133,21 @@ void Menu::AddNewProduct()
   Utils::promptForInput("Enter product quantity: ", product_quantity);
 
   Product newProduct(product_name, product_price, product_quantity);
-  productStack.pushProduct(newProduct);                 // Add to stack
-  productManager.saveProducts(productStack, "replace"); // Save to database
+  productStack.pushProduct(newProduct);
+  productManager.saveProducts(productStack, "replace");
 
   std::cout << "Added new product: " << product_name << std::endl;
+}
+
+void Menu::SpinWheel()
+{
+  int discount = promoManager.spinWheel();
+  std::cout << "Congratulations! You won a " << discount << "% discount on your next order!" << std::endl;
+
+  Promo promo(0, currentUser.getId(), discount, Utils::getCurrentTimestamp());
+  promoManager.addPromo(promo);
+
+  std::cout << "Your discount has been saved for future use!" << std::endl;
 }
 
 void Menu::UndoLastAddedProduct()
@@ -140,7 +156,7 @@ void Menu::UndoLastAddedProduct()
   {
     Product removedProduct = productStack.popProduct();
     std::cout << "Undoing the last added product: " << removedProduct.getName() << std::endl;
-    productManager.saveProducts(productStack, "replace"); // Update the database
+    productManager.saveProducts(productStack, "replace");
   }
   else
   {
@@ -158,8 +174,8 @@ void Menu::AddNewInquiry()
   std::string inquiryMessage;
   Utils::promptForInput("Enter your inquiry message: ", inquiryMessage);
 
-  Inquiry inquiry(currentUser, inquiryMessage, Utils::getCurrentTimestamp()); // Create Inquiry object
-  inquiryManager.saveInquiryToDB(inquiry);                                    // Save inquiry
+  Inquiry inquiry(currentUser, inquiryMessage, Utils::getCurrentTimestamp());
+  inquiryManager.saveInquiryToDB(inquiry);
 
   std::cout << "Inquiry added!" << std::endl;
 }
@@ -180,26 +196,21 @@ void Menu::ProcessInquiry()
 
     Inquiry inquiry = inquiryQueue.peekFront();
 
-    // Display the inquiry details
     std::cout << "Inquiry from: " << inquiry.getUser().getName() << " ("
               << inquiry.getUser().getEmail() << ")\n";
     std::cout << "Message: " << inquiry.getMessage() << "\n";
     std::cout << "Timestamp: " << inquiry.getTimestamp() << "\n";
 
-    // Prompt the admin to enter a response
     std::string response;
     Utils::promptForInput("Enter your response: ", response);
 
-    // Set the response and save to the database
     inquiry.setResponse(response);
-    inquiryManager.saveInquiryResponseToDB(inquiry); // Implement this in InquiryManager
+    inquiryManager.saveInquiryResponseToDB(inquiry);
 
     std::cout << "Response saved.\n";
 
-    // Remove the inquiry from the queue
     inquiryQueue.dequeue();
 
-    // Ask the admin whether to continue processing more inquiries
     char choice;
     std::cout << "Do you want to process the next inquiry? (y/n): ";
     std::cin >> choice;
@@ -213,14 +224,14 @@ void Menu::ProcessInquiry()
 
 void Menu::ViewInquiries()
 {
-  inquiryQueue = inquiryManager.loadInquiriesForUser(currentUser.getId()); // Load inquiries for the current user
+  inquiryQueue = inquiryManager.loadInquiriesForUser(currentUser.getId());
   if (inquiryQueue.isEmpty())
   {
     std::cout << "No inquiries found for your account." << std::endl;
     return;
   }
 
-  inquiryQueue.displayAllInquiries(); // Display all inquiries for the current user
+  inquiryQueue.displayAllInquiries();
 }
 
 void Menu::ExitMenu()

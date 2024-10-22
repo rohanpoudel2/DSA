@@ -2,29 +2,26 @@
 #define INQUIRY_H
 
 #include <string>
-#include "User.h" // Include the User class
+#include "User.h"
 
 class Inquiry
 {
 private:
-  int inquiryId;         // Unique ID for the inquiry
-  User user;             // User who made the inquiry
-  std::string message;   // The actual inquiry message
-  std::string response;  // The response to the inquiry
-  std::string timestamp; // Timestamp of when the inquiry was created
+  int inquiryId;
+  User user;
+  std::string message;
+  std::string response;
+  std::string timestamp;
 
 public:
-  // Constructor
   Inquiry(const User &user, const std::string &message, const std::string &timestamp);
 
-  // Getters
   int getInquiryId() const;
-  const User &getUser() const; // Return the User object
+  const User &getUser() const;
   std::string getMessage() const;
   std::string getResponse() const;
   std::string getTimestamp() const;
 
-  // Setters
   void setInquiryId(int id);
   void setUser(const User &user);
   void setMessage(const std::string &msg);

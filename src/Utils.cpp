@@ -9,20 +9,18 @@
 #include "rapidjson/filereadstream.h"
 #include <iostream>
 
-// Handle input failure, clear errors and ignore invalid input
 bool Utils::handleInputFailure(std::istream &input)
 {
   if (input.fail())
   {
     std::cerr << "Invalid input. Please try again." << std::endl;
-    input.clear();                                                   // clear error flag
-    input.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // discard invalid input
+    input.clear();
+    input.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     return true;
   }
   return false;
 }
 
-// Hash the password using SHA-256
 std::string Utils::hashPassword(const std::string &password)
 {
   std::hash<std::string> hashFunction;
@@ -30,15 +28,13 @@ std::string Utils::hashPassword(const std::string &password)
   return std::to_string(hashedValue);
 }
 
-// Specialization for `std::string` (to handle spaces properly)
 template <>
 void Utils::promptForInput<std::string>(const std::string &message, std::string &value)
 {
   std::cout << message;
-  std::getline(std::cin >> std::ws, value); // std::getline handles spaces in input
+  std::getline(std::cin >> std::ws, value);
 }
 
-// Specialization for `int`
 template <>
 void Utils::promptForInput<int>(const std::string &message, int &value)
 {
@@ -47,7 +43,6 @@ void Utils::promptForInput<int>(const std::string &message, int &value)
   handleInputFailure(std::cin);
 }
 
-// Specialization for `double`
 template <>
 void Utils::promptForInput<double>(const std::string &message, double &value)
 {
@@ -56,17 +51,15 @@ void Utils::promptForInput<double>(const std::string &message, double &value)
   handleInputFailure(std::cin);
 }
 
-// Function to get the current timestamp as a string
 std::string Utils::getCurrentTimestamp()
 {
   std::time_t t = std::time(nullptr);
   std::tm tm = *std::localtime(&t);
   std::ostringstream oss;
-  oss << std::put_time(&tm, "%Y-%m-%d %H:%M:%S"); // Format timestamp
+  oss << std::put_time(&tm, "%Y-%m-%d %H:%M:%S");
   return oss.str();
 }
 
-// Function to get the database path from a config file
 std::string Utils::getDatabasePath(std::string &environment)
 {
   FILE *fp = fopen("config.json", "r");

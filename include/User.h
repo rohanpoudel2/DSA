@@ -11,7 +11,7 @@ private:
   std::string name;
   std::string email;
   std::string role;
-  std::string password; // Fixed typo here
+  std::string password;
 
 public:
   // Default constructor

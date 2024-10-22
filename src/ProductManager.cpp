@@ -6,11 +6,10 @@ ProductManager::ProductManager(const std::string &filename) : Database(filename)
   db = connectToDB(sourceFile);
   if (db != nullptr)
   {
-    createTables(); // Ensure necessary tables are created
+    createTables();
   }
 }
 
-// Create product table
 void ProductManager::createTables()
 {
   const char *createProductTableSQL = R"(
@@ -30,7 +29,6 @@ void ProductManager::createTables()
   }
 }
 
-// Save product list to the database
 void ProductManager::saveProducts(const ProductList &productList, const std::string &mode)
 {
   if (mode == "replace")
@@ -62,7 +60,6 @@ void ProductManager::saveProducts(const ProductList &productList, const std::str
   }
 }
 
-// Load products from the database
 void ProductManager::loadProducts(ProductList &productList)
 {
   productList.clear();
