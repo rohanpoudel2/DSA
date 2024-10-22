@@ -14,7 +14,7 @@ private:
   std::string timestamp;
 
 public:
-  Inquiry(const User &user, const std::string &message, const std::string &timestamp);
+  Inquiry(const User &user, const std::string &message, const std::string &response, const std::string &timestamp);
 
   int getInquiryId() const;
   const User &getUser() const;

@@ -98,7 +98,20 @@ void Menu::Login()
   }
   else
   {
-    Utils::promptForInput("Enter your email: ", email);
+    bool validEmail = false;
+    while (!validEmail)
+    {
+      Utils::promptForInput("Enter your email: ", email);
+      if (Utils::isValidEmail(email))
+      {
+        validEmail = true;
+      }
+      else
+      {
+        std::cerr << "Invalid email format. Please try again." << std::endl;
+      }
+    }
+
     currentUser = userManager.getCustomerByEmail(email, userManager.getDB());
 
     if (currentUser.getEmail().empty())
@@ -141,6 +154,11 @@ void Menu::AddNewProduct()
 
 void Menu::SpinWheel()
 {
+  if (promoManager.userHasPromo(currentUser.getId()))
+  {
+    std::cout << "You already have a discount promo!" << promoManager.getUserPromo(currentUser.getId()).getDiscountPercentage() << std::endl;
+    return;
+  }
   int discount = promoManager.spinWheel();
   std::cout << "Congratulations! You won a " << discount << "% discount on your next order!" << std::endl;
 
@@ -174,7 +192,7 @@ void Menu::AddNewInquiry()
   std::string inquiryMessage;
   Utils::promptForInput("Enter your inquiry message: ", inquiryMessage);
 
-  Inquiry inquiry(currentUser, inquiryMessage, Utils::getCurrentTimestamp());
+  Inquiry inquiry(currentUser, inquiryMessage, "", Utils::getCurrentTimestamp());
   inquiryManager.saveInquiryToDB(inquiry);
 
   std::cout << "Inquiry added!" << std::endl;

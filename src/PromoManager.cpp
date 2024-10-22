@@ -104,3 +104,39 @@ bool PromoManager::userHasPromo(int userId)
   sqlite3_finalize(stmt);
   return hasPromo;
 }
+
+Promo PromoManager::getUserPromo(int userId)
+{
+  const char *sql = "SELECT promo_id, discount_percentage, timestamp FROM promos WHERE user_id = ? LIMIT 1;";
+  sqlite3_stmt *stmt;
+
+  Promo promo(0, userId, 0, "");
+
+  if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) == SQLITE_OK)
+  {
+    sqlite3_bind_int(stmt, 1, userId);
+
+    if (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+      int promoId = sqlite3_column_int(stmt, 0);
+      int discountPercentage = sqlite3_column_int(stmt, 1);
+      std::string timestamp(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2)));
+
+      promo.setPromoId(promoId);
+      promo.setUserId(userId);
+      promo.setDiscountPercentage(discountPercentage);
+      promo.setTimestamp(timestamp);
+    }
+    else
+    {
+      std::cerr << "Error retrieving promo: " << sqlite3_errmsg(db) << std::endl;
+    }
+  }
+  else
+  {
+    std::cerr << "Error preparing statement: " << sqlite3_errmsg(db) << std::endl;
+  }
+
+  sqlite3_finalize(stmt);
+  return promo;
+}

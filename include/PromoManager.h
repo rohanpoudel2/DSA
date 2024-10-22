@@ -18,7 +18,9 @@ public:
 
   void addPromo(const Promo &promo);
 
-  std::list<Promo> userHasPromo(int userId);
+  bool userHasPromo(int userId);
+
+  Promo getUserPromo(int userId);
 
   int spinWheel();
 };

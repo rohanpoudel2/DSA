@@ -1,7 +1,7 @@
 #include "Inquiry.h"
 
-Inquiry::Inquiry(const User &user, const std::string &message, const std::string &timestamp)
-    : user(user), message(message), timestamp(timestamp) {}
+Inquiry::Inquiry(const User &user, const std::string &message, const std::string &response, const std::string &timestamp)
+    : user(user), message(message), response(response), timestamp(timestamp) {}
 
 int Inquiry::getInquiryId() const { return inquiryId; }
 const User &Inquiry::getUser() const { return user; }

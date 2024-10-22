@@ -72,7 +72,7 @@ void InquiryManager::saveInquiryToDB(const Inquiry &inquiry)
 InquiryQueue InquiryManager::loadInquiriesForUser(int userId)
 {
   InquiryQueue inquiryQueue;
-  const char *sql = "SELECT inquiry_id, user_id, message, timestamp FROM inquiries WHERE user_id = ?;";
+  const char *sql = "SELECT inquiry_id, user_id, message, response ,timestamp FROM inquiries WHERE user_id = ?;";
   sqlite3_stmt *stmt;
 
   if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) == SQLITE_OK)
@@ -84,9 +84,10 @@ InquiryQueue InquiryManager::loadInquiriesForUser(int userId)
       User user = User::getUserById(userId, db);
       int fetchedUserId = sqlite3_column_int(stmt, 1);
       std::string message = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
-      std::string timestamp = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
+      std::string response = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
+      std::string timestamp = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 4));
 
-      Inquiry inquiry(user, message, timestamp);
+      Inquiry inquiry(user, message, response, timestamp);
       inquiryQueue.enqueue(inquiry);
     }
   }
@@ -129,7 +130,7 @@ InquiryQueue InquiryManager::loadAllInquiriesWithNoResponses()
       std::string timestamp = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
 
       User user = User::getUserById(userId, db);
-      Inquiry inquiry(user, message, timestamp);
+      Inquiry inquiry(user, message, "", timestamp);
       inquiry.setInquiryId(inquiryId);
       inquiryQueue.enqueue(inquiry);
     }

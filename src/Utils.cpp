@@ -8,6 +8,7 @@
 #include "rapidjson/document.h"
 #include "rapidjson/filereadstream.h"
 #include <iostream>
+#include <regex>
 
 bool Utils::handleInputFailure(std::istream &input)
 {
@@ -87,4 +88,10 @@ std::string Utils::getDatabasePath(std::string &environment)
   {
     throw std::runtime_error("Invalid config file format.");
   }
+}
+
+bool Utils::isValidEmail(const std::string &email)
+{
+  std::regex emailRegex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+  return std::regex_match(email, emailRegex);
 }

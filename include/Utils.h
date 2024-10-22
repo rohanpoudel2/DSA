@@ -16,6 +16,8 @@ public:
 
   static std::string getCurrentTimestamp();
   static std::string getDatabasePath(std::string &environment);
+
+  static bool isValidEmail(const std::string &email);
 };
 
 // Template declaration (but not specialized here in the header)

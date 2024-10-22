@@ -44,6 +44,7 @@ void InquiryQueue::displayAllInquiries() const
     std::cout << "Customer Name: " << inquiry.getUser().getName() << "\n";
     std::cout << "Customer Email: " << inquiry.getUser().getEmail() << "\n";
     std::cout << "Inquiry Message: " << inquiry.getMessage() << "\n";
+    std::cout << "Inquiry Response: " << inquiry.getResponse() << "\n";
     std::cout << "-------------------------------\n";
     tempQueue.pop();
   }
