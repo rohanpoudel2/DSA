@@ -51,14 +51,16 @@ void UserManager::createTable()
   }
 }
 
-bool UserManager::verifyAdminPassword(const std::string &hashedPassword, sqlite3 *db)
+bool UserManager::verifyPassword(int userId, const std::string &hashedPassword, sqlite3 *db)
 {
   sqlite3_stmt *stmt;
-  const char *sql = "SELECT password FROM users WHERE role='admin';";
+  const char *sql = "SELECT password FROM users WHERE id=?;";
   bool verified = false;
 
   if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) == SQLITE_OK)
   {
+    sqlite3_bind_int(stmt, 1, userId);
+
     if (sqlite3_step(stmt) == SQLITE_ROW)
     {
       std::string storedHash = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 0));

@@ -48,14 +48,15 @@ void InquiryManager::saveInquiryResponseToDB(const Inquiry &inquiry)
 
 void InquiryManager::saveInquiryToDB(const Inquiry &inquiry)
 {
-  const char *sql = "INSERT INTO inquiries (user_id, message, timestamp) VALUES (?, ?, ?);";
+  const char *sql = "INSERT INTO inquiries (user_id, message, response, timestamp) VALUES (?, ?, ?,?);";
   sqlite3_stmt *stmt;
 
   if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) == SQLITE_OK)
   {
     sqlite3_bind_int(stmt, 1, inquiry.getUser().getId());
     sqlite3_bind_text(stmt, 2, inquiry.getMessage().c_str(), -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 3, inquiry.getTimestamp().c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 3, "", -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 4, inquiry.getTimestamp().c_str(), -1, SQLITE_STATIC);
 
     if (sqlite3_step(stmt) != SQLITE_DONE)
     {
@@ -117,7 +118,7 @@ void InquiryManager::removeInquiryFromDB(int inquiryId)
 InquiryQueue InquiryManager::loadAllInquiriesWithNoResponses()
 {
   InquiryQueue inquiryQueue;
-  const char *sql = "SELECT inquiry_id, user_id, message, timestamp FROM inquiries WHERE response IS NULL;";
+  const char *sql = "SELECT inquiry_id, user_id, message, timestamp FROM inquiries WHERE response = '';";
   sqlite3_stmt *stmt;
 
   if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) == SQLITE_OK)

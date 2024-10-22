@@ -11,35 +11,44 @@ Menu::Menu()
       inquiryQueue()
 {
   Login();
+  initializeMenuOptions();
+  productManager.loadProducts(productStack);
+}
+
+void Menu::initializeMenuOptions()
+{
   if (currentUser.isAdmin())
   {
-    menu_options = {{{1, "Add new product", std::bind(&Menu::AddNewProduct, this)},
-                     {2, "View all products", std::bind(&Menu::ViewAllProducts, this)},
-                     {3, "Undo last added product", std::bind(&Menu::UndoLastAddedProduct, this)},
-                     {4, "Process inquiry", std::bind(&Menu::ProcessInquiry, this)},
-                     {5, "Exit", std::bind(&Menu::ExitMenu, this)}}};
+    admin_menu_options = {{{1, "Add new product", std::bind(&Menu::AddNewProduct, this)},
+                           {2, "View all products", std::bind(&Menu::ViewAllProducts, this)},
+                           {3, "Undo last added product", std::bind(&Menu::UndoLastAddedProduct, this)},
+                           {4, "Process inquiry", std::bind(&Menu::ProcessInquiry, this)},
+                           {5, "Exit", std::bind(&Menu::ExitMenu, this)}}};
   }
   else
   {
-    menu_options = {{{1, "Add new inquiry", std::bind(&Menu::AddNewInquiry, this)},
-                     {2, "View inquiries", std::bind(&Menu::ViewInquiries, this)},
-                     {3, "Spin Wheel for Promo", std::bind(&Menu::SpinWheel, this)},
-                     {4, "Exit", std::bind(&Menu::ExitMenu, this)}}};
+    // Use direct initialization for customer options
+    customer_menu_options = {{{1, "Add new inquiry", std::bind(&Menu::AddNewInquiry, this)},
+                              {2, "View inquiries", std::bind(&Menu::ViewInquiries, this)},
+                              {3, "Spin Wheel for Promo", std::bind(&Menu::SpinWheel, this)},
+                              {4, "Exit", std::bind(&Menu::ExitMenu, this)}}};
   }
-
-  productManager.loadProducts(productStack);
 }
 
 void Menu::displayMenu() const
 {
-  std::cout << "===============================" << std::endl;
-  std::cout << "       E-commerce Store" << std::endl;
-  std::cout << "===============================" << std::endl;
-  for (const auto &option : menu_options)
+  std::cout << "===============================\n";
+  std::cout << "       E-commerce Store\n";
+  std::cout << "===============================\n";
+
+  const auto &menu = currentUser.isAdmin() ? admin_menu_options : customer_menu_options;
+
+  for (const auto &option : menu)
   {
     std::cout << std::get<0>(option) << ". " << std::get<1>(option) << std::endl;
   }
-  std::cout << "===============================" << std::endl;
+
+  std::cout << "===============================\n";
   std::cout << "Enter your choice: ";
 }
 
@@ -51,7 +60,9 @@ void Menu::processOption() const
   if (Utils::handleInputFailure(std::cin))
     return;
 
-  for (const auto &option : menu_options)
+  const auto &menu = currentUser.isAdmin() ? admin_menu_options : customer_menu_options;
+
+  for (const auto &option : menu)
   {
     if (std::get<0>(option) == choice)
     {
@@ -81,54 +92,83 @@ void Menu::Login()
 
   if (roleOption == 1)
   {
-    Utils::promptForInput("Enter admin password: ", password);
-    if (userManager.verifyAdminPassword(Utils::hashPassword(password), userManager.getDB()))
-    {
-      currentUser = User("Admin", "admin@store.com", "admin", password);
-      std::cout << "Admin access granted!" << std::endl;
-    }
-    else
-    {
-      std::cerr << "Invalid admin credentials!" << std::endl;
-      exit(1);
-    }
+    handleAdminLogin(password);
   }
   else
   {
-    bool validEmail = false;
-    while (!validEmail)
+    handleCustomerLogin(email, password);
+  }
+}
+
+void Menu::handleAdminLogin(std::string &password)
+{
+  Utils::promptForInput("Enter admin password: ", password);
+  if (userManager.verifyPassword(1, Utils::hashPassword(password), userManager.getDB()))
+  {
+    currentUser = User("Admin", "rohan@poudel.com", "admin", password);
+    std::cout << "Admin access granted!" << std::endl;
+  }
+  else
+  {
+    std::cerr << "Invalid admin credentials!" << std::endl;
+    exit(1);
+  }
+}
+
+void Menu::handleCustomerLogin(std::string &email, std::string &password)
+{
+  bool validEmail = false;
+  while (!validEmail)
+  {
+    Utils::promptForInput("Enter your email: ", email);
+    if (Utils::isValidEmail(email))
     {
-      Utils::promptForInput("Enter your email: ", email);
-      if (Utils::isValidEmail(email))
-      {
-        validEmail = true;
-      }
-      else
-      {
-        std::cerr << "Invalid email format. Please try again." << std::endl;
-      }
-    }
-
-    currentUser = userManager.getCustomerByEmail(email, userManager.getDB());
-
-    if (currentUser.getEmail().empty())
-    {
-      std::string name;
-      Utils::promptForInput("Enter your name: ", name);
-      std::string plainPassword;
-      Utils::promptForInput("Enter your password: ", plainPassword);
-
-      currentUser = User(name, email, "customer", Utils::hashPassword(plainPassword));
-      userManager.addUser(currentUser, userManager.getDB());
-      std::cout << "Customer registered!" << std::endl;
-
-      std::cout << "As a new customer, you get a chance to spin the wheel for a discount!" << std::endl;
-      SpinWheel();
+      validEmail = true;
     }
     else
     {
-      std::cout << "Welcome back, " << currentUser.getName() << "!" << std::endl;
+      std::cerr << "Invalid email format. Please try again." << std::endl;
     }
+  }
+
+  currentUser = userManager.getCustomerByEmail(email, userManager.getDB());
+
+  if (currentUser.getEmail().empty())
+  {
+    registerNewCustomer(email);
+  }
+  else
+  {
+    authenticateReturningCustomer(password);
+  }
+}
+
+void Menu::registerNewCustomer(const std::string &email)
+{
+  std::string name, plainPassword;
+  Utils::promptForInput("Enter your name: ", name);
+  Utils::promptForInput("Enter your password: ", plainPassword);
+
+  currentUser = User(name, email, "customer", Utils::hashPassword(plainPassword));
+  userManager.addUser(currentUser, userManager.getDB());
+  std::cout << "Customer registered!" << std::endl;
+
+  std::cout << "As a new customer, you get a chance to spin the wheel for a discount!" << std::endl;
+  SpinWheel();
+}
+
+void Menu::authenticateReturningCustomer(std::string &password)
+{
+  std::cout << "Welcome back, " << currentUser.getName() << "!" << std::endl;
+  Utils::promptForInput("Enter your password: ", password);
+  if (userManager.verifyPassword(1, Utils::hashPassword(password), userManager.getDB()))
+  {
+    std::cout << "Access granted!" << std::endl;
+  }
+  else
+  {
+    std::cerr << "Invalid credentials!" << std::endl;
+    exit(1);
   }
 }
 
@@ -153,7 +193,7 @@ void Menu::SpinWheel()
 {
   if (promoManager.userHasPromo(currentUser.getId()))
   {
-    std::cout << "You already have a discount promo!" << promoManager.getUserPromo(currentUser.getId()).getDiscountPercentage() << std::endl;
+    std::cout << "You already have a discount promo! " << promoManager.getUserPromo(currentUser.getId()).getDiscountPercentage() << "%" << std::endl;
     return;
   }
   int discount = promoManager.spinWheel();

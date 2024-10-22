@@ -12,7 +12,7 @@ public:
 
   void addUser(const User &user, sqlite3 *db);
   User getCustomerByEmail(const std::string &email, sqlite3 *db);
-  bool verifyAdminPassword(const std::string &hashedPassword, sqlite3 *db);
+  bool verifyPassword(int userId, const std::string &hashedPassword, sqlite3 *db);
 };
 
 #endif
