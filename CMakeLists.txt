@@ -56,17 +56,30 @@ enable_testing()
 
 # Add the test executable
 add_executable(runTests
-    tests/test_product.cpp
-    # tests/test_productlist.cpp
-    # tests/test_database.cpp
-    # tests/test_menu.cpp
-    src/Product.cpp
-    # src/ProductList.cpp
-    # src/Database.cpp
-    # src/ProductManager.cpp
-    # src/UserManager.cpp
-    # src/InquiryManager.cpp
-    # src/Utils.cpp
+  tests/test_database.cpp
+  tests/test_product.cpp
+  tests/test_product_list.cpp
+  tests/test_product_manager.cpp
+  tests/test_user_manager.cpp
+  tests/test_user.cpp
+  tests/test_inquiry.cpp
+  tests/test_inquiry_queue.cpp
+  tests/test_promo.cpp
+  tests/test_promo_manager.cpp
+  tests/test_circular_linked_list.cpp
+  src/User.cpp
+  src/Product.cpp
+  src/ProductList.cpp
+  src/Database.cpp
+  src/ProductManager.cpp
+  src/InquiryManager.cpp
+  src/InquiryQueue.cpp
+  src/Inquiry.cpp
+  src/UserManager.cpp
+  src/PromoManager.cpp
+  src/CircularLinkedList.cpp
+  src/Promo.cpp
+  src/Utils.cpp
 )
 
 # Link GoogleTest and sqlite3 with the test executable

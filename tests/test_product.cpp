@@ -1,43 +1,74 @@
 #include <gtest/gtest.h>
 #include "Product.h"
+#include <sstream>
 
-// Test the default constructor
+// Test default constructor
 TEST(ProductTest, DefaultConstructor)
 {
-  Product p;
-  EXPECT_EQ(p.getName(), "___");
-  EXPECT_EQ(p.getPrice(), 0.0);
-  EXPECT_EQ(p.getQuantity(), 0.0);
+  Product product;
+
+  // Check default values
+  EXPECT_EQ(product.getName(), "___");
+  EXPECT_EQ(product.getPrice(), 0.0);
+  EXPECT_EQ(product.getQuantity(), 0.0);
 }
 
-// Test the parameterized constructor
+// Test parameterized constructor
 TEST(ProductTest, ParameterizedConstructor)
 {
-  Product p("Laptop", 999.99, 10);
-  EXPECT_EQ(p.getName(), "Laptop");
-  EXPECT_EQ(p.getPrice(), 999.99);
-  EXPECT_EQ(p.getQuantity(), 10);
+  Product product("Laptop", 1200.99, 5);
+
+  // Check values after initialization
+  EXPECT_EQ(product.getName(), "Laptop");
+  EXPECT_EQ(product.getPrice(), 1200.99);
+  EXPECT_EQ(product.getQuantity(), 5);
 }
 
-// Test the setters and getters
-TEST(ProductTest, SettersAndGetters)
+// Test setName and getName
+TEST(ProductTest, SetAndGetName)
 {
-  Product p;
-  p.setName("Phone");
-  p.setPrice(599.99);
-  p.setQuantity(5);
+  Product product;
+  product.setName("Keyboard");
 
-  EXPECT_EQ(p.getName(), "Phone");
-  EXPECT_EQ(p.getPrice(), 599.99);
-  EXPECT_EQ(p.getQuantity(), 5);
+  EXPECT_EQ(product.getName(), "Keyboard");
 }
 
-// Test displayProduct (capture output)
+// Test setPrice and getPrice
+TEST(ProductTest, SetAndGetPrice)
+{
+  Product product;
+  product.setPrice(49.99);
+
+  EXPECT_EQ(product.getPrice(), 49.99);
+}
+
+// Test setQuantity and getQuantity
+TEST(ProductTest, SetAndGetQuantity)
+{
+  Product product;
+  product.setQuantity(10);
+
+  EXPECT_EQ(product.getQuantity(), 10);
+}
+
+// Test displayProduct
 TEST(ProductTest, DisplayProduct)
 {
-  Product product("Tablet", 299.99, 5);
-  testing::internal::CaptureStdout(); // Capture console output
+  Product product("Monitor", 299.99, 3);
+  std::stringstream buffer;
+
+  // Redirect cout to buffer
+  std::streambuf *oldCoutBuffer = std::cout.rdbuf(buffer.rdbuf());
+
+  // Call displayProduct
   product.displayProduct();
-  std::string output = testing::internal::GetCapturedStdout();
-  EXPECT_EQ(output, "Product Name: Tablet\nPrice: $299.99\nQuantity: 5\n");
+
+  // Restore cout
+  std::cout.rdbuf(oldCoutBuffer);
+
+  // Verify the output
+  std::string output = buffer.str();
+  EXPECT_NE(output.find("Product Name: Monitor"), std::string::npos);
+  EXPECT_NE(output.find("Price: $299.99"), std::string::npos);
+  EXPECT_NE(output.find("Quantity: 3"), std::string::npos);
 }

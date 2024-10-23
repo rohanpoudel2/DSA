@@ -18,13 +18,13 @@ class Menu
 private:
   // Admin menu options
   // Precondition: Admin user must be logged in
-  // Postcondition: An array of available actions for the admin is created
-  std::array<std::tuple<int, std::string, std::function<void()>>, 5> admin_menu_options;
+  // Postcondition: A Vector of available actions for the admin is created
+  std::vector<std::tuple<int, std::string, std::function<void()>>> admin_menu_options;
 
   // Customer menu options
   // Precondition: Customer user must be logged in
-  // Postcondition: An array of available actions for the customer is created
-  std::array<std::tuple<int, std::string, std::function<void()>>, 4> customer_menu_options;
+  // Postcondition: A Vector of available actions for the customer is created
+  std::vector<std::tuple<int, std::string, std::function<void()>>> customer_menu_options;
 
   // Objects to manage database-related operations for users, products, inquiries, and promotions.
   // Preconditions: Each of these managers must be initialized with a valid database path.
@@ -32,7 +32,7 @@ private:
   UserManager userManager;
   ProductManager productManager;
   InquiryManager inquiryManager;
-  InquiryQueue inquiryQueue; // Queue to hold customer inquiries.
+  InquiryQueue inquiryQueue;
   PromoManager promoManager;
 
   // Represents the current logged-in user.
