@@ -62,6 +62,7 @@ void ProductList::displayAllProducts() const
   }
 }
 
+// Written by Rohan Poudel
 void ProductList::clear()
 {
   while (head != nullptr)
@@ -73,6 +74,7 @@ void ProductList::clear()
   head = nullptr;
 }
 
+// Written by Rohan Poudel
 bool ProductList::isEmpty() const
 {
   return head == nullptr;

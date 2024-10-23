@@ -6,11 +6,13 @@
 #include <sqlite3.h>
 #include <iostream>
 
+// Written by Rohan Poudel
 Database::Database(const std::string &filename) : sourceFile(filename)
 {
   db = connectToDB(sourceFile);
 }
 
+// Written by Rohan Poudel
 Database::~Database()
 {
   if (db)
@@ -19,7 +21,7 @@ Database::~Database()
   }
 }
 
-// Connect to SQLite Database
+// Written by Rohan Poudel
 sqlite3 *Database::connectToDB(const std::string &dbPath)
 {
   sqlite3 *db;
@@ -31,6 +33,7 @@ sqlite3 *Database::connectToDB(const std::string &dbPath)
   return db;
 }
 
+// Written by Rohan Poudel
 void Database::createTables()
 {
   UserManager userDB(sourceFile);

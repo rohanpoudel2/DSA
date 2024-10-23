@@ -10,6 +10,7 @@
 #include <iostream>
 #include <regex>
 
+// Written by Rohan Poudel
 bool Utils::handleInputFailure(std::istream &input)
 {
   if (input.fail())
@@ -22,6 +23,7 @@ bool Utils::handleInputFailure(std::istream &input)
   return false;
 }
 
+// Written by Rohan Poudel
 std::string Utils::hashPassword(const std::string &password)
 {
   std::hash<std::string> hashFunction;
@@ -29,6 +31,7 @@ std::string Utils::hashPassword(const std::string &password)
   return std::to_string(hashedValue);
 }
 
+// Written by Rohan Poudel
 template <>
 void Utils::promptForInput<std::string>(const std::string &message, std::string &value)
 {
@@ -36,6 +39,7 @@ void Utils::promptForInput<std::string>(const std::string &message, std::string 
   std::getline(std::cin >> std::ws, value);
 }
 
+// Written by Rohan Poudel
 template <>
 void Utils::promptForInput<int>(const std::string &message, int &value)
 {
@@ -44,6 +48,7 @@ void Utils::promptForInput<int>(const std::string &message, int &value)
   handleInputFailure(std::cin);
 }
 
+// Written by Rohan Poudel
 template <>
 void Utils::promptForInput<double>(const std::string &message, double &value)
 {
@@ -52,6 +57,7 @@ void Utils::promptForInput<double>(const std::string &message, double &value)
   handleInputFailure(std::cin);
 }
 
+// Written by Rohan Poudel
 std::string Utils::getCurrentTimestamp()
 {
   std::time_t t = std::time(nullptr);
@@ -61,6 +67,7 @@ std::string Utils::getCurrentTimestamp()
   return oss.str();
 }
 
+// Written by Rohan Poudel
 std::string Utils::getDatabasePath(std::string &environment)
 {
   FILE *fp = fopen("config.json", "r");
@@ -90,6 +97,7 @@ std::string Utils::getDatabasePath(std::string &environment)
   }
 }
 
+// Written by Rohan Poudel
 bool Utils::isValidEmail(const std::string &email)
 {
   std::regex emailRegex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");

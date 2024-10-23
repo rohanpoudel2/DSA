@@ -1,11 +1,13 @@
 #include "ProductManager.h"
 #include <iostream>
 
+// Written by Rohan Poudel
 ProductManager::ProductManager(const std::string &filename) : Database(filename)
 {
   createTable();
 }
 
+// Written by Rohan Poudel
 void ProductManager::createTable()
 {
   const char *createProductTableSQL = R"(
@@ -25,6 +27,7 @@ void ProductManager::createTable()
   }
 }
 
+// Written by Rohan Poudel
 void ProductManager::saveProducts(const ProductList &productList, const std::string &mode)
 {
   if (mode == "replace")
@@ -56,6 +59,7 @@ void ProductManager::saveProducts(const ProductList &productList, const std::str
   }
 }
 
+// Written by Rohan Poudel
 void ProductManager::loadProducts(ProductList &productList)
 {
   productList.clear();

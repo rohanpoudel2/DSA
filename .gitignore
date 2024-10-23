@@ -1,6 +1,7 @@
 build/**
 
 data/*
+!data/*.db
 
 CMakeCache.txt
 CMakeFiles/

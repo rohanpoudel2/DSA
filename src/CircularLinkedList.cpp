@@ -3,8 +3,10 @@
 #include <ctime>
 #include <iostream>
 
+// Written by Rohan Poudel
 CircularLinkedList::CircularLinkedList() : head(nullptr) {}
 
+// Written by Rohan Poudel
 CircularLinkedList::~CircularLinkedList()
 {
   if (head)
@@ -20,6 +22,7 @@ CircularLinkedList::~CircularLinkedList()
   }
 }
 
+// Written by Rohan Poudel
 void CircularLinkedList::addDiscount(int discount)
 {
   CircularNode *newNode = new CircularNode(discount);
@@ -40,11 +43,13 @@ void CircularLinkedList::addDiscount(int discount)
   }
 }
 
+// Written by Rohan Poudel
 bool CircularLinkedList::isEmpty() const
 {
   return head == nullptr;
 }
 
+// Written by Rohan Poudel
 int CircularLinkedList::spinWheel()
 {
   if (isEmpty())

@@ -1,13 +1,16 @@
 #include "InquiryQueue.h"
 #include <iostream>
 
+// Written by Rohan Poudel
 InquiryQueue::InquiryQueue() {}
 
+// Written by Rohan Poudel
 void InquiryQueue::enqueue(const Inquiry &inquiry)
 {
   queue.push(inquiry);
 }
 
+// Written by Rohan Poudel
 Inquiry InquiryQueue::dequeue()
 {
   if (isEmpty())
@@ -19,6 +22,7 @@ Inquiry InquiryQueue::dequeue()
   return inquiry;
 }
 
+// Written by Rohan Poudel
 Inquiry InquiryQueue::peekFront() const
 {
   if (isEmpty())
@@ -28,6 +32,7 @@ Inquiry InquiryQueue::peekFront() const
   return queue.front();
 }
 
+// Written by Rohan Poudel
 void InquiryQueue::displayAllInquiries() const
 {
   std::queue<Inquiry> tempQueue = queue;
@@ -50,6 +55,7 @@ void InquiryQueue::displayAllInquiries() const
   }
 }
 
+// Written by Rohan Poudel
 bool InquiryQueue::isEmpty() const
 {
   return queue.empty();

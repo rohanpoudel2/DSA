@@ -52,6 +52,9 @@ public:
   // Postcondition: Returns true if the list is empty, false otherwise
   bool isEmpty() const;
 
+  // Clears the linked list
+  // Precondition: None
+  // Postcondition: All nodes in the list are deleted, and the head is set to nullptr
   void clear();
 };
 

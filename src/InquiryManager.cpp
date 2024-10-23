@@ -2,11 +2,13 @@
 #include <iostream>
 #include <sqlite3.h>
 
+// Written by Rohan Poudel
 InquiryManager::InquiryManager(const std::string &filename) : Database(filename)
 {
   createTable();
 }
 
+// Written by Rohan Poudel
 void InquiryManager::createTable()
 {
   const char *createInquiryTableSQL = R"(
@@ -28,6 +30,7 @@ void InquiryManager::createTable()
   }
 }
 
+// Written by Rohan Poudel
 void InquiryManager::saveInquiryResponseToDB(const Inquiry &inquiry)
 {
   const char *sql = "UPDATE inquiries SET response = ? WHERE inquiry_id = ?;";
@@ -46,6 +49,7 @@ void InquiryManager::saveInquiryResponseToDB(const Inquiry &inquiry)
   sqlite3_finalize(stmt);
 }
 
+// Written by Rohan Poudel
 void InquiryManager::saveInquiryToDB(const Inquiry &inquiry)
 {
   const char *sql = "INSERT INTO inquiries (user_id, message, response, timestamp) VALUES (?, ?, ?,?);";
@@ -70,6 +74,7 @@ void InquiryManager::saveInquiryToDB(const Inquiry &inquiry)
   }
 }
 
+// Written by Rohan Poudel
 InquiryQueue InquiryManager::loadInquiriesForUser(int userId)
 {
   InquiryQueue inquiryQueue;
@@ -101,6 +106,7 @@ InquiryQueue InquiryManager::loadInquiriesForUser(int userId)
   return inquiryQueue;
 }
 
+// Written by Rohan Poudel
 void InquiryManager::removeInquiryFromDB(int inquiryId)
 {
   const char *sql = "DELETE FROM inquiries WHERE inquiry_id = ?;";
@@ -115,6 +121,7 @@ void InquiryManager::removeInquiryFromDB(int inquiryId)
   sqlite3_finalize(stmt);
 }
 
+// Written by Rohan Poudel
 InquiryQueue InquiryManager::loadAllInquiriesWithNoResponses()
 {
   InquiryQueue inquiryQueue;

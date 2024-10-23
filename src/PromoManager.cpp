@@ -4,11 +4,13 @@
 #include <ctime>
 #include <cstdlib>
 
+// Written by Rohan Poudel
 PromoManager::PromoManager(const std::string &filename) : Database(filename)
 {
   createTable();
 }
 
+// Written by Rohan Poudel
 void PromoManager::createTable()
 {
   const char *createTableSQL = R"(
@@ -29,11 +31,10 @@ void PromoManager::createTable()
   }
 }
 
-PromoManager::~PromoManager()
-{
-  // The db pointer is handled by the Database class, so no need to close here.
-}
+// Written by Rohan Poudel
+PromoManager::~PromoManager() {}
 
+// Written by Rohan Poudel
 void PromoManager::addPromo(const Promo &promo)
 {
   const char *sql = "INSERT INTO promos (user_id, discount_percentage, timestamp) VALUES (?, ?, ?);";
@@ -54,6 +55,7 @@ void PromoManager::addPromo(const Promo &promo)
   sqlite3_finalize(stmt);
 }
 
+// Written by Rohan Poudel
 int PromoManager::spinWheel()
 {
   CircularLinkedList discountList;
@@ -69,6 +71,7 @@ int PromoManager::spinWheel()
   return discountList.spinWheel();
 }
 
+// Written by Rohan Poudel
 bool PromoManager::userHasPromo(int userId)
 {
   const char *sql = "SELECT COUNT(*) FROM promos WHERE user_id = ?;";
@@ -98,6 +101,7 @@ bool PromoManager::userHasPromo(int userId)
   return hasPromo;
 }
 
+// Written by Rohan Poudel
 Promo PromoManager::getUserPromo(int userId)
 {
   const char *sql = "SELECT promo_id, discount_percentage, timestamp FROM promos WHERE user_id = ? LIMIT 1;";

@@ -2,11 +2,13 @@
 #include "Utils.h"
 #include <iostream>
 
+// Written by Rohan Poudel
 UserManager::UserManager(const std::string &filename) : Database(filename)
 {
   createTable();
 }
 
+// Written by Rohan Poudel
 void UserManager::createTable()
 {
   const char *createUserTableSQL = R"(
@@ -51,6 +53,7 @@ void UserManager::createTable()
   }
 }
 
+// Written by Rohan Poudel
 bool UserManager::verifyPassword(int userId, const std::string &hashedPassword, sqlite3 *db)
 {
   sqlite3_stmt *stmt;
@@ -71,6 +74,7 @@ bool UserManager::verifyPassword(int userId, const std::string &hashedPassword, 
   return verified;
 }
 
+// Written by Rohan Poudel
 void UserManager::addUser(const User &user, sqlite3 *db)
 {
   const char *sql = "INSERT INTO users (name, email, role, password) VALUES (?,?,?,?);";
@@ -91,6 +95,7 @@ void UserManager::addUser(const User &user, sqlite3 *db)
   sqlite3_finalize(stmt);
 }
 
+// Written by Rohan Poudel
 User UserManager::getCustomerByEmail(const std::string &email, sqlite3 *db)
 {
   const char *sql = "SELECT id, name, email, role, password FROM users WHERE email=?;";
