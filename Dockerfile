@@ -9,6 +9,8 @@ RUN apt-get update && apt-get install -y \
   wget \
   curl \
   gdb \
+  libsqlite3-dev \
+  lcov \
   && apt-get clean
 
 # Set the working directory inside the container
@@ -23,5 +25,5 @@ RUN chmod +x ./build.sh ./run.sh ./run_tests.sh
 # Run the build script to build the project
 RUN ./build.sh
 
-# Specify the default command to run your app (optional)
+# Specify the default command to run your app 
 CMD ["./run.sh"]

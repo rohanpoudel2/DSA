@@ -21,7 +21,7 @@ Database::~Database()
   }
 }
 
-// Written by Rohan Poudel
+// Written with AI Assistance (ChatGPT)
 sqlite3 *Database::connectToDB(const std::string &dbPath)
 {
   sqlite3 *db;

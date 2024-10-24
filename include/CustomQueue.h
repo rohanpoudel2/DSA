@@ -1,6 +1,9 @@
 #ifndef CUSTOM_QUEUE_H
 #define CUSTOM_QUEUE_H
 
+#include <iostream>
+#include <stdexcept>
+
 template <typename T>
 class CustomQueue
 {

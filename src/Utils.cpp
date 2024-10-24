@@ -23,7 +23,7 @@ bool Utils::handleInputFailure(std::istream &input)
   return false;
 }
 
-// Written by Rohan Poudel
+// Written with AI Assistance (ChatGPT)
 std::string Utils::hashPassword(const std::string &password)
 {
   std::hash<std::string> hashFunction;
@@ -57,7 +57,7 @@ void Utils::promptForInput<double>(const std::string &message, double &value)
   handleInputFailure(std::cin);
 }
 
-// Written by Rohan Poudel
+// Written with AI Assistance (ChatGPT)
 std::string Utils::getCurrentTimestamp()
 {
   std::time_t t = std::time(nullptr);
@@ -67,7 +67,7 @@ std::string Utils::getCurrentTimestamp()
   return oss.str();
 }
 
-// Written by Rohan Poudel
+// Written with AI Assistance (ChatGPT)
 std::string Utils::getDatabasePath(std::string &environment)
 {
   FILE *fp = fopen("config.json", "r");
@@ -97,7 +97,7 @@ std::string Utils::getDatabasePath(std::string &environment)
   }
 }
 
-// Written by Rohan Poudel
+// Written with AI Assistance (ChatGPT)
 bool Utils::isValidEmail(const std::string &email)
 {
   std::regex emailRegex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");

@@ -67,6 +67,8 @@ add_executable(runTests
   tests/test_promo.cpp
   tests/test_promo_manager.cpp
   tests/test_circular_linked_list.cpp
+  tests/test_menu.cpp
+  src/Menu.cpp
   src/User.cpp
   src/Product.cpp
   src/ProductList.cpp

@@ -27,7 +27,7 @@ void ProductManager::createTable()
   }
 }
 
-// Written by Rohan Poudel
+// Written with AI Assistance (ChatGPT)
 void ProductManager::saveProducts(const ProductList &productList, const std::string &mode)
 {
   if (mode == "replace")
