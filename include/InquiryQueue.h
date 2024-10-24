@@ -1,13 +1,13 @@
 #ifndef INQUIRYQUEUE_H
 #define INQUIRYQUEUE_H
 
-#include <queue>
+#include "CustomQueue.h"
 #include "Inquiry.h"
 
 class InquiryQueue
 {
 private:
-  std::queue<Inquiry> queue;
+  CustomQueue<Inquiry> queue;
 
 public:
   // Constructor
