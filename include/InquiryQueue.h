@@ -7,7 +7,7 @@
 class InquiryQueue
 {
 private:
-  CustomQueue<Inquiry> queue;
+  CustomQueue queue;
 
 public:
   // Constructor
@@ -26,6 +26,12 @@ public:
   // Throws a runtime error if the queue is empty.
   Inquiry dequeue();
 
+  // Peek at the front inquiry of the queue without removing it
+  // Precondition: The queue must not be empty.
+  // Postcondition: Returns the inquiry at the front of the queue without removing it.
+  // Throws a runtime error if the queue is empty.
+  Inquiry peekFront() const;
+
   // Display all inquiries in the queue
   // Precondition: None
   // Postcondition: Prints the details of all inquiries in the queue to the console.
@@ -35,12 +41,6 @@ public:
   // Precondition: None
   // Postcondition: Returns true if the queue is empty, otherwise false.
   bool isEmpty() const;
-
-  // Peek at the front inquiry of the queue without removing it
-  // Precondition: The queue must not be empty.
-  // Postcondition: Returns the inquiry at the front of the queue without removing it.
-  // Throws a runtime error if the queue is empty.
-  Inquiry peekFront() const;
 };
 
 #endif

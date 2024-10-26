@@ -1,6 +1,6 @@
 #include <iostream>
-
 #include "InquiryQueue.h"
+#include "CustomQueue.h"
 
 // Written by Rohan Poudel
 InquiryQueue::InquiryQueue() {}
@@ -34,22 +34,25 @@ Inquiry InquiryQueue::peekFront() const
 // Written by Rohan Poudel
 void InquiryQueue::displayAllInquiries() const
 {
-  CustomQueue<Inquiry> tempQueue = queue; // Copy the queue
-
-  if (tempQueue.isEmpty())
+  if (queue.isEmpty())
   {
     std::cout << "No inquiries available.\n";
     return;
   }
 
+  CustomQueue tempQueue = queue;
+
   while (!tempQueue.isEmpty())
   {
-    Inquiry inquiry = tempQueue.dequeue();
+    Inquiry inquiry = tempQueue.peek();
     std::cout << "Customer Name: " << inquiry.getUser().getName() << "\n";
     std::cout << "Customer Email: " << inquiry.getUser().getEmail() << "\n";
     std::cout << "Inquiry Message: " << inquiry.getMessage() << "\n";
     std::cout << "Inquiry Response: " << inquiry.getResponse() << "\n";
     std::cout << "-------------------------------\n";
+
+    // Dequeue each inquiry to avoid infinite loop
+    tempQueue.dequeue();
   }
 }
 

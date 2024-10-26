@@ -4,6 +4,7 @@
 #include "Utils.h"
 #include <fstream>
 #include <cstdio>
+#include "Environment.h"
 
 // Helper function to clean up database after tests
 void removeTestDB(const std::string &dbPath)
@@ -15,7 +16,7 @@ void removeTestDB(const std::string &dbPath)
 class UserManagerTest : public ::testing::Test
 {
 protected:
-  std::string testDBPath = "./test_users.db";
+  std::string testDBPath = Utils::getDatabasePath(Environment::environment);
   UserManager *userManager;
 
   void SetUp() override

@@ -176,7 +176,6 @@ void Menu::registerNewCustomer(const std::string &email)
   std::cout << "Customer registered!" << std::endl;
 
   std::cout << "As a new customer, you get a chance to spin the wheel for a discount!" << std::endl;
-  SpinWheel();
 }
 
 // Written by Rohan Poudel

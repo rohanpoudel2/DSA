@@ -30,6 +30,7 @@ add_executable(EcommerceStore
   src/Promo.cpp
   src/Menu.cpp
   src/Utils.cpp
+  src/CustomQueue.cpp
 )
 
 # Find and include SQLite3
@@ -67,7 +68,7 @@ add_executable(runTests
   tests/test_promo.cpp
   tests/test_promo_manager.cpp
   tests/test_circular_linked_list.cpp
-  tests/test_menu.cpp
+  tests/Environment.cpp
   src/Menu.cpp
   src/User.cpp
   src/Product.cpp
@@ -82,6 +83,7 @@ add_executable(runTests
   src/CircularLinkedList.cpp
   src/Promo.cpp
   src/Utils.cpp
+  src/CustomQueue.cpp
 )
 
 # Link GoogleTest and sqlite3 with the test executable

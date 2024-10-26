@@ -61,7 +61,7 @@ TEST(UserTest, GetUserById)
 {
   // Initialize the database
   sqlite3 *db;
-  sqlite3_open(":memory:", &db); // Use an in-memory database for testing
+  sqlite3_open(":memory:", &db);
 
   // Create the users table
   const char *createUserTableSQL = R"(

@@ -2,6 +2,8 @@
 #include "ProductManager.h"
 #include "ProductList.h"
 #include "Product.h"
+#include "Utils.h"
+#include "Environment.h"
 
 // Helper function to clean the database by clearing the products table
 void clearProductsTable(ProductManager &productManager)
@@ -13,7 +15,7 @@ void clearProductsTable(ProductManager &productManager)
 // Test creating the products table
 TEST(ProductManagerTest, CreateTable)
 {
-  ProductManager productManager("./data/store_test.db");
+  ProductManager productManager(Utils::getDatabasePath(Environment::environment));
 
   // Check if the table was created by executing a SELECT query
   sqlite3_stmt *stmt;
@@ -30,7 +32,7 @@ TEST(ProductManagerTest, CreateTable)
 // Test saving products to the database
 TEST(ProductManagerTest, SaveProducts)
 {
-  ProductManager productManager("./data/store_test.db");
+  ProductManager productManager(Utils::getDatabasePath(Environment::environment));
   ProductList productList;
 
   // Clear the products table before starting the test
@@ -69,7 +71,7 @@ TEST(ProductManagerTest, SaveProducts)
 // Test loading products from the database
 TEST(ProductManagerTest, LoadProducts)
 {
-  ProductManager productManager("./data/store_test.db");
+  ProductManager productManager(Utils::getDatabasePath(Environment::environment));
   ProductList productList;
 
   // Clear the products table before starting the test
@@ -106,7 +108,7 @@ TEST(ProductManagerTest, LoadProducts)
 // Test replacing products in the database
 TEST(ProductManagerTest, ReplaceProducts)
 {
-  ProductManager productManager("./data/store_test.db");
+  ProductManager productManager(Utils::getDatabasePath(Environment::environment));
   ProductList productList;
 
   // Clear the products table before starting the test

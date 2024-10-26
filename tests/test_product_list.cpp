@@ -6,7 +6,7 @@
 TEST(ProductListTest, DefaultConstructor)
 {
   ProductList productList;
-  EXPECT_TRUE(productList.isEmpty()); // The list should be empty after construction
+  EXPECT_TRUE(productList.isEmpty());
 }
 
 // Test pushing products onto the list
@@ -15,7 +15,7 @@ TEST(ProductListTest, PushProduct)
   ProductList productList;
   productList.pushProduct(Product("Laptop", 1000.0, 2));
 
-  EXPECT_FALSE(productList.isEmpty()); // The list should not be empty after pushing a product
+  EXPECT_FALSE(productList.isEmpty());
   EXPECT_EQ(productList.getHead()->product.getName(), "Laptop");
   EXPECT_EQ(productList.getHead()->product.getPrice(), 1000.0);
   EXPECT_EQ(productList.getHead()->product.getQuantity(), 2);
@@ -86,15 +86,15 @@ TEST(ProductListTest, Clear)
   productList.pushProduct(Product("Keyboard", 49.99, 10));
 
   productList.clear();
-  EXPECT_TRUE(productList.isEmpty()); // List should be empty after clearing
+  EXPECT_TRUE(productList.isEmpty());
 }
 
 // Test isEmpty method when list has products
 TEST(ProductListTest, IsEmpty)
 {
   ProductList productList;
-  EXPECT_TRUE(productList.isEmpty()); // Initially empty
+  EXPECT_TRUE(productList.isEmpty());
 
   productList.pushProduct(Product("Mouse", 25.99, 5));
-  EXPECT_FALSE(productList.isEmpty()); // Should not be empty after adding product
+  EXPECT_FALSE(productList.isEmpty());
 }

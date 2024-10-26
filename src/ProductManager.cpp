@@ -41,22 +41,29 @@ void ProductManager::saveProducts(const ProductList &productList, const std::str
     }
   }
 
+  const char *sqlInsert = "INSERT INTO products (name, price, quantity) VALUES (?, ?, ?);";
+  sqlite3_stmt *stmt;
+
+  if (sqlite3_prepare_v2(db, sqlInsert, -1, &stmt, nullptr) != SQLITE_OK)
+  {
+    std::cerr << "Failed to prepare SQL statement: " << sqlite3_errmsg(db) << std::endl;
+    return;
+  }
+
   ProductList::Node *current = productList.getHead();
   while (current != nullptr)
   {
-    std::string sqlInsert = "INSERT INTO products (name, price, quantity) VALUES ('" +
-                            current->product.getName() + "', " +
-                            std::to_string(current->product.getPrice()) + ", " +
-                            std::to_string(current->product.getQuantity()) + ");";
-
-    char *errMsg = nullptr;
-    if (sqlite3_exec(db, sqlInsert.c_str(), nullptr, nullptr, &errMsg) != SQLITE_OK)
+    sqlite3_bind_text(stmt, 1, current->product.getName().c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_double(stmt, 2, current->product.getPrice());
+    sqlite3_bind_int(stmt, 3, current->product.getQuantity());
+    if (sqlite3_step(stmt) != SQLITE_DONE)
     {
-      std::cerr << "SQL error: " << errMsg << std::endl;
-      sqlite3_free(errMsg);
+      std::cerr << "SQL error: " << sqlite3_errmsg(db) << std::endl;
     }
+    sqlite3_reset(stmt);
     current = current->next;
   }
+  sqlite3_finalize(stmt);
 }
 
 // Written by Rohan Poudel

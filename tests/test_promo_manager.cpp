@@ -2,6 +2,8 @@
 #include "PromoManager.h"
 #include "UserManager.h"
 #include "Promo.h"
+#include "Utils.h"
+#include "Environment.h"
 #include <sqlite3.h>
 
 // Helper function to clean the promos database
@@ -50,11 +52,10 @@ bool cleanUserDatabase(const std::string &filePath)
   return true;
 }
 
-// Test creating the promos table
 TEST(PromoManagerTest, CreateTable)
 {
-  const std::string dbPath = "./data/store_test.db";
-  PromoManager promoManager(dbPath);
+  std::string testDBPath = Utils::getDatabasePath(Environment::environment);
+  PromoManager promoManager(testDBPath);
 
   // Assuming table creation will not throw an error, we pass the test
   SUCCEED();
@@ -63,12 +64,11 @@ TEST(PromoManagerTest, CreateTable)
 // Test adding a promo to the database and retrieving it
 TEST(PromoManagerTest, AddPromoAndRetrieve)
 {
-  const std::string dbPath = "./data/store_test.db";
-  ASSERT_TRUE(cleanPromoDatabase(dbPath)); // Ensure promos table is clean
-  ASSERT_TRUE(cleanUserDatabase(dbPath));  // Ensure users table is clean
+  std::string testDBPath = Utils::getDatabasePath(Environment::environment);
+  ASSERT_TRUE(cleanPromoDatabase(testDBPath)); // Ensure promos table is clean
 
-  PromoManager promoManager(dbPath);
-  UserManager userManager(dbPath);
+  PromoManager promoManager(testDBPath);
+  UserManager userManager(testDBPath);
 
   User user("Alice", "alice@example.com", "customer", "password123");
   userManager.addUser(user, userManager.getDB());
@@ -89,8 +89,8 @@ TEST(PromoManagerTest, AddPromoAndRetrieve)
 // Test the spinWheel function
 TEST(PromoManagerTest, SpinWheel)
 {
-  const std::string dbPath = "./data/store_test.db";
-  PromoManager promoManager(dbPath);
+  std::string testDBPath = Utils::getDatabasePath(Environment::environment);
+  PromoManager promoManager(testDBPath);
 
   // Spin the wheel multiple times to check the validity of discounts
   for (int i = 0; i < 10; ++i)
@@ -103,12 +103,12 @@ TEST(PromoManagerTest, SpinWheel)
 // Test checking if a user has no promo
 TEST(PromoManagerTest, UserHasNoPromo)
 {
-  const std::string dbPath = "./data/store_test.db";
-  ASSERT_TRUE(cleanPromoDatabase(dbPath)); // Ensure promos table is clean
-  ASSERT_TRUE(cleanUserDatabase(dbPath));  // Ensure users table is clean
+  std::string testDBPath = Utils::getDatabasePath(Environment::environment);
+  ASSERT_TRUE(cleanPromoDatabase(testDBPath)); // Ensure promos table is clean
+  ASSERT_TRUE(cleanUserDatabase(testDBPath));  // Ensure users table is clean
 
-  PromoManager promoManager(dbPath);
-  UserManager userManager(dbPath);
+  PromoManager promoManager(testDBPath);
+  UserManager userManager(testDBPath);
 
   User user("Bob", "bob@example.com", "customer", "password456");
   userManager.addUser(user, userManager.getDB());

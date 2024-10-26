@@ -4,7 +4,6 @@
 #include <iomanip>
 #include <sstream>
 #include <ctime>
-
 #include "rapidjson/document.h"
 #include "rapidjson/filereadstream.h"
 #include <iostream>
@@ -39,22 +38,34 @@ void Utils::promptForInput<std::string>(const std::string &message, std::string 
   std::getline(std::cin >> std::ws, value);
 }
 
-// Written by Rohan Poudel
+// Modified to keep asking for valid input until success
 template <>
 void Utils::promptForInput<int>(const std::string &message, int &value)
 {
-  std::cout << message;
-  std::cin >> value;
-  handleInputFailure(std::cin);
+  while (true)
+  {
+    std::cout << message;
+    std::cin >> value;
+    if (!handleInputFailure(std::cin))
+    {
+      break; // exit loop if input is valid
+    }
+  }
 }
 
-// Written by Rohan Poudel
+// Modified to keep asking for valid input until success
 template <>
 void Utils::promptForInput<double>(const std::string &message, double &value)
 {
-  std::cout << message;
-  std::cin >> value;
-  handleInputFailure(std::cin);
+  while (true)
+  {
+    std::cout << message;
+    std::cin >> value;
+    if (!handleInputFailure(std::cin))
+    {
+      break; // exit loop if input is valid
+    }
+  }
 }
 
 // Written with AI Assistance (ChatGPT)
